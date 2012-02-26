@@ -1,4 +1,9 @@
-# Designing a RESTful Web API: Quick Start Guide
+---
+title: Designing a RESTful Web API
+layout: wikistyle
+---
+
+# Designing a RESTful Web API
 
 Author: Luis Rei
 <me@luisrei.com>

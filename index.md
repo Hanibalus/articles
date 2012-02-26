@@ -6,8 +6,8 @@ layout: wikistyle
 # {{page.title}}
 
 
-home: [LuisRei.com](http://luisrei.com)
+[LuisRei.com](http://luisrei.com)
 
 
 ## Article List
-...
+[Designing a RESTful Web API][/rest.html]
