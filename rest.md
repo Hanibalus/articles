@@ -141,6 +141,14 @@ More broadly speaking, representation isn't just about file format, it could als
 	Accept-Charset: iso-8859-5
 	Accept-Encoding: gzip
 	
+There's one more big thing that the Accept header can handle for RESTful Web APIs: media type **versioning**. Here's an example (from [spire.io][spire]) that includes both the resource representation and the version of the media type being used:
+
+		Accept: application/vnd.spire-io.session+json;version=1.0
+
+When a particular version is no longer supported by the server, the appropriate server response is
+
+	415 Media Type Not Supported
+
 
 ### Caching
 There are two main HTTP response headers for controlling caching behavior: **Expires** which specifies an absolute expiry time for a cached representation and **Cache-Control** which specifies a relative expiry time using the *max-age* directive.
