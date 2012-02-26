@@ -10,4 +10,4 @@ layout: wikistyle
 
 
 ## Article List
-[Designing a RESTful Web API][/rest.html]
+26 Feb 2012 - [Designing a RESTful Web API](/rest.html)

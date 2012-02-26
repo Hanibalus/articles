@@ -5,9 +5,9 @@ layout: wikistyle
 
 # Designing a RESTful Web API
 
-Author: Luis Rei
-<me@luisrei.com>
-[@lmrei](http://twitter.com/lmrei)
+Author: Luis Rei <br/>
+<me@luisrei.com> <br/>
+[@lmrei](http://twitter.com/lmrei) <br/>
 [http://luisrei.com](http://luisrei.com)
 
 Date: 26 February 2012
@@ -43,13 +43,15 @@ Resources can have different **representations**. The above mentioned user has t
 is wrong. It's obvious that *delete* is an action, not a resource. The way to do perform an action in a RESTful web service is to use HTTP **verbs** or **request methods**:
 
 <table>
-<tbody><tr><th>HTTP Verb</th>
+<tr>
+<th>HTTP Verb</th>
 <th>Action (typical usage)</th>
 </tr>
 <tr>
 <td>GET</td>
 <td>retrieves a representation of a resource without side-effects (nothing changes on the server).</td>
 </tr>
+<tr>
 <td>HEAD</td>
 <td>retrieves just the resource meta-information (headers) i.e. same as GET but without the response body - also without side-effects.</td>
 </tr>
@@ -73,8 +75,7 @@ is wrong. It's obvious that *delete* is an action, not a resource. The way to do
 <td>DELETE</td>
 <td>deletes a resource.</td>
 </tr>
-
-</tbody></table>
+</table>
 
 When using PUT, POST or PATCH, send the data as a document in the body of the request. Don't use query parameters to alter state. An example from the [GitHub API][ghv3]:
 
