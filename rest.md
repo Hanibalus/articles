@@ -109,7 +109,7 @@ A RESTful HTTP server application has to return the status code according to the
 ## For Everything Else, There Are Headers
 Resources are mapped to URLs, actions are mapped to verbs and the rest goes in the headers.
 
-### Content Negotiation and Versioning
+### Content Negotiation
 Choosing between different representations of the same resource is a matter of using [HTTP content negotiation][httpcontent]:
 
 	GET https://api.github.com/gists/1
@@ -139,11 +139,7 @@ More broadly speaking, representation isn't just about file format, it could als
 	Accept-Language: en-US
 	Accept-Charset: iso-8859-5
 	Accept-Encoding: gzip
-
-There's one more big thing that the Accept header can handle for RESTful Web APIs: **versioning**. Here's an example (from [spire.io][spire]) that includes both the resource representation and the version of the API being used:
-
-	Accept: application/vnd.spire-io.session+json;version=1.0
-
+	
 
 ### Caching
 There are two main HTTP response headers for controlling caching behavior: **Expires** which specifies an absolute expiry time for a cached representation and **Cache-Control** which specifies a relative expiry time using the *max-age* directive.
