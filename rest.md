@@ -10,7 +10,8 @@ Author: Luis Rei <br/>
 [@lmrei](http://twitter.com/lmrei) <br/>
 [http://luisrei.com](http://luisrei.com)
 
-Date: 26 February 2012
+Publication Date: 26 February 2012 <br/>
+[Source & Revisions](https://github.com/lrei/articles/blob/gh-pages/rest.md)
  
 
 ## Purpose, Scope, Miscellaneous
