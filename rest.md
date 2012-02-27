@@ -306,6 +306,8 @@ results in:
 
 [Get some REST on twitter](http://twitter.com/getsomerestbook) - Steve Klabnik
 
+[Nobody Understands REST or HTTP](http://blog.steveklabnik.com/posts/2011-07-03-nobody-understands-rest-or-http) - Steve Klabnik
+
 [Versioning REST Web Services](http://barelyenough.org/blog/2008/05/versioning-rest-web-services/) - Peter Williams
 
 [Hypertext Transfer Protocol -- HTTP/1.1 ](http://www.w3.org/Protocols/rfc2616/rfc2616) - R. Fielding, J. Gettys, J. Mogul, H. Frystyk, L. Masinter, P. Leach, T. Berners-Lee
