@@ -1,13 +1,13 @@
 ---
 title: publish.luisrei.com
-layout: wikistyle
+layout: default
 ---
 
-# {{page.title}}
-
-
-[LuisRei.com](http://luisrei.com)
-
-
 ## Article List
-26 Feb 2012 - [Designing a RESTful Web API](/rest.html)
+
+<ul class=posts>
+    {% for post in site.posts %}
+      <li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }}</a></li>
+    {% endfor %}
+</ul>
+		
