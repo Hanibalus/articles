@@ -4,7 +4,7 @@ layout: post
 ---
 [Example Code](https://github.com/lrei/articles/tree/master/2012-05-02-flaskrest)
 
-[Hacker News Discussion](http://publish.luisrei.com/articles/flaskrest.html)
+[Hacker News Discussion](http://news.ycombinator.com/item?id=3918986)
 
 ## Introduction
 To begin:
