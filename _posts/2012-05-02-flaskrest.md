@@ -2,6 +2,9 @@
 title: Implementing a RESTful Web API with Python & Flask
 layout: post
 ---
+[Example Code](https://github.com/lrei/articles/tree/master/2012-05-02-flaskrest)
+
+[Hacker News Discussion](http://publish.luisrei.com/articles/flaskrest.html)
 
 ## Introduction
 To begin:
@@ -14,9 +17,9 @@ I'm assuming you already know the basics of REST. If not, or if you want a quick
 
 Flask is a good choice for a REST API because it is:
 
-* Written in Python (yes, that can be an advantage);
+* Written in Python (that can be an advantage);
 * Simple to use;
-* Customizable;
+* Flexible;
 * Multiple good [deployment options](http://flask.pocoo.org/docs/deploying/#deployment);
 * **RESTful request dispatching**
 
