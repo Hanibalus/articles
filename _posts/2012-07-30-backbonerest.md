@@ -2,7 +2,8 @@
 title: Developing REST API Client Applications with JavaScript & Backbone.js
 layout: post
 ---
-## An Introduction to Client-Side Web Application Development
+
+ An Introduction to Client-Side Web Application Development
 
 ## Overview
 
