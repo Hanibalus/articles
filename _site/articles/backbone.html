@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Developing REST API Client Applications with JavaScript &amp; Backbone</title>
+    <link href="/shared/css/documentation.css" media="screen" rel="stylesheet" type="text/css">
+    <link href="/shared/css/pygments.css" media="screen" rel="stylesheet" type="text/css">
+	<link href="/stylesheets/screen.css" media="screen" rel="stylesheet" type="text/css">
+
+  </head>
+  
+  <body>
+    <div id="main">
+      <div id="wrapper">
+	
+		<!-- SITE CONTENT -->
+        <div id="content" class="site">
+			<h1>Developing REST API Client Applications with JavaScript &amp; Backbone</h1>
+			<div class ="metadata">
+			  <div class="author">
+		      <p>
+		       <b>Luis Rei</b><br/>
+				<a href="http://luisrei.com">http://luisrei.com</a> 
+		      </p>
+		    </div>
+		      <div class="author">
+				<p>
+				 me@luisrei.com<br/>
+				 <a href="http://twitter.com/lmrei">@lmrei</a>
+				</p>
+			  </div>
+			  <div class="docdate">
+			    <p><br/>
+				  
+				  30 Jul 2012<br/>
+				  
+			    </p>
+			  </div>
+			</div>
+			<div class="data">
+			
+          <div class="wikistyle">
+
+<h2>Overview</h2>
+
+<p>This article is an introduction to client-side web application development.</p>
+
+<p><a href="http://backbonejs.org">Backbone.js</a> is a JavaScript framework for creating single-page web applications. In broad terms this means our application will consist of one HTML file which will be dynamically modified by the JavaScript according to user actions and JSON formatted data from the server. Rendering (converting data to HTML) will be done by the client application.</p>
+
+<p>As the title implies, the main focus focus of this article is on developing rich client-side web applications that interact with REST APIs. That said, I've tried to keep it as general as possible.</p>
+
+<p>Backbone's online <a href="http://backbonejs.org">documentation</a> and <a href="http://backbonejs.org/docs/backbone.html">annotated source code</a> are the best places to learn more about Backbone.js. At the time of writing, the whole commented source code is under 1500 lines.</p>
+
+<p><a href="http://todomvc.com">TodoMVC</a> provides a good introductory <a href="https://github.com/addyosmani/todomvc/tree/master/architecture-examples/backbone">example</a> using Local Storage instead of a REST API.</p>
+
+<h3>Libraries</h3>
+
+<p>There are some libraries that provide crucial functionality to a Backbone.js application. The choice of templating library is in large part a personal one. This article uses Handlebars but it can be easily replaced by another.</p>
+
+<p><strong><a href="http://backbonejs.org">Backbone.js</a></strong></p>
+
+<blockquote><p>Backbone.js gives structure to web applications by providing models with key-value binding and custom events, collections with a rich API of enumerable functions, views with declarative event handling, and connects it all to your existing API over a RESTful JSON interface.</p></blockquote>
+
+<p><strong><a href="http://documentcloud.github.com/underscore/">Underscore.js</a></strong> - the only Backbone.js <em>hard</em> dependency</p>
+
+<blockquote><p>Underscore is a utility-belt library for JavaScript that provides a lot of the functional programming support that you would expect in Prototype.js (or Ruby), but without extending any of the built-in JavaScript objects. It's the tie to go along with jQuery's tux, and Backbone.js's suspenders.</p></blockquote>
+
+<p><strong><a href="http://handlebarsjs.com">Handlebars</a></strong></p>
+
+<blockquote><p>Handlebars provides the power necessary to let you build semantic templates effectively with no frustration.</p></blockquote>
+
+<p><strong><a href="http://jquery.com">jQuery</a></strong></p>
+
+<blockquote><p>jQuery is a fast and concise JavaScript Library that simplifies HTML document traversing, event handling, animating, and Ajax interactions for rapid web development.</p></blockquote>
+
+<h3>Tools</h3>
+
+<p><strong><a href="http://nodejs.org">Node.js</a></strong></p>
+
+<blockquote><p>Node.js is a platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications.</p></blockquote>
+
+<p>In this article, Node.js is only used because it is required by the other tools.</p>
+
+<p><strong><a href="https://github.com/mishoo/UglifyJS">uglifyjs</a></strong></p>
+
+<blockquote><p>JavaScript parser / mangler / compressor / beautifier library for NodeJS</p></blockquote>
+
+<p><strong><a href="http://handlebarsjs.com/precompilation.html">Handlebars Precompiler</a></strong></p>
+
+<blockquote><p>Using the Handlebars precompiler, you can precompile your Handlebars templates to save time on the client and reduce the required runtime size of the handlebars library.</p></blockquote>
+
+<p><strong><a href="https://github.com/cowboy/grunt">grunt</a></strong></p>
+
+<blockquote><p>A task-based command line build tool for JavaScript projects.</p></blockquote>
+
+<p><strong><a href="https://github.com/twitter/recess">RECESS</a></strong></p>
+
+<blockquote><p>A simple, attractive code quality tool for CSS built on top of LESS.</p></blockquote>
+
+<p>RECESS is not actually shown anywhere in this article because no LESS/CSS code in shown but it's used in the actual application development.</p>
+
+<h2>Application Architecture</h2>
+
+<p>The client application architecture will consist of the following components:</p>
+
+<ul>
+<li><strong>Models</strong> (Backbone.Model): data management;</li>
+<li><strong>Collections</strong> (Backbone.Collection): groups of models;</li>
+<li><strong>Views</strong> (Backnone.View): user interface logic;</li>
+<li><strong>Routers</strong> (Backbone.Router): state management (translate URLs into application state);</li>
+<li><strong>Templates</strong> (Handlebars): <em>"dumb"</em> user interface (mostly HTML with variables and basic expressions to access them e.g. <code>each</code>).</li>
+</ul>
+
+
+<p>If you're acquainted with either the <a href="https://en.wikipedia.org/wiki/Model-view-controller">Model-View-Controller</a> or the <a href="https://en.wikipedia.org/wiki/Model_View_Presenter">Model-View-Presenter</a> patterns, you will no doubt realize there are similarities. MVP is a better fit if you consider Backbone.View as a Presenter and an external template as a View.</p>
+
+<h3>JavaScript &amp; Directory Structure</h3>
+
+<p>The application will be contained in a single namespace. In JavaScript this can be done using Objects and object notation (read more about it in <a href="http://addyosmani.com/resources/essentialjsdesignpatterns/book/#detailnamespacing">Learning JavaScript Design Patterns</a>):</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">App</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">Models</span><span class="o">:</span> <span class="p">{},</span>
+  <span class="nx">Collections</span><span class="o">:</span> <span class="p">{},</span>
+  <span class="nx">Routers</span><span class="o">:</span> <span class="p">{},</span>
+  <span class="nx">Views</span><span class="o">:</span> <span class="p">{},</span>
+  <span class="nx">init</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>   <span class="p">},</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+
+<p>This will be part of our js/app.js and in another file, such as js/models/example.js, we have</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">App</span><span class="p">.</span><span class="nx">Models</span><span class="p">.</span><span class="nx">Example</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>   <span class="p">});</span>
+</code></pre>
+</div>
+
+
+<p>Alternatively, consider using <a href="http://requirejs.org">RequireJS</a> a JavaScript file and module loader (which I don't use).</p>
+
+<p>The structure for the <code>source</code> directory is:</p>
+
+<pre><code>index.html
+css/ or less/
+js/
+- js/lib: libraries (Backbone, Handlebars, …)
+- js/models: App.Models.*
+- js/collections: App.Collections.*
+- js/views: App.Views.*
+- js/routers: App.Routers.*
+- js/templates: Handlebars[*]
+- js/app.js
+</code></pre>
+
+<p>And an <code>assets</code> directory</p>
+
+<pre><code>assets/
+- assets/index.html
+- assets/css/
+- assets/js/
+</code></pre>
+
+<p>The assets/ directory is where the concatenated and minimized JavaScript and compiled LESS or minimized CSS are stored. Its contents are what will be uploaded to the web server and later downloaded by the user via the browser.</p>
+
+<p>The idea is that while developing you separate the your application's JavaScript files according to their <em>Namespace</em> and then concatenate (or merge) them together into a single "app.js" file.</p>
+
+<h2>App Init &amp; Router</h2>
+
+<p>The <code>App.init</code> function is usually run after the DOM is ready i.e. all assets (scripts, stylesheets, images, …) have been downloaded by the client's browser:</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">App</span><span class="p">.</span><span class="nx">init</span><span class="p">();</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+
+<p>The application starts by creating a <code>Router</code> and enabling routing by calling <code>Backbone.history.start()</code> which monitors the browser for URL changes</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">init</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">App</span><span class="p">.</span><span class="nx">router</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">.</span><span class="nx">Routers</span><span class="p">.</span><span class="nx">Router</span><span class="p">();</span>
+  <span class="nx">Backbone</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">start</span><span class="p">();</span>
+<span class="p">},</span>
+</code></pre>
+</div>
+
+
+<p>A router simply maps a browser URL such as</p>
+
+<pre><code>http://www.example.com/#directory/shopping
+</code></pre>
+
+<p>(note the <strong>#</strong> or hash) to a function such as</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">directory</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>   <span class="p">}</span>
+</code></pre>
+</div>
+
+
+<p>URL changes will <strong>not trigger page refreshes</strong>, instead they trigger an event that will be handled by the router</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">App</span><span class="p">.</span><span class="nx">Routers</span><span class="p">.</span><span class="nx">Router</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Router</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">routes</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s1">&#39;&#39;</span><span class="o">:</span>         <span class="s1">&#39;index&#39;</span><span class="p">,</span>  
+    <span class="s1">&#39;foo/:id&#39;</span><span class="o">:</span>  <span class="s1">&#39;foo&#39;</span>
+  <span class="p">},</span>
+  <span class="nx">index</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>  <span class="p">},</span>
+  <span class="nx">foo</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+
+<p>This example router maps URLs such as</p>
+
+<pre><code>http://www.example.com/#foo/123
+</code></pre>
+
+<p>to the <em>foo</em> function which could look like this</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">foo</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">.</span><span class="nx">Models</span><span class="p">.</span><span class="nx">Foo</span><span class="p">({</span><span class="nx">urlRoot</span> <span class="o">:</span> <span class="s1">&#39;/foos&#39;</span><span class="p">,</span> <span class="nx">id</span><span class="o">:</span><span class="nx">id</span><span class="p">});</span>
+  <span class="nx">foo</span><span class="p">.</span><span class="nx">fetch</span><span class="p">();</span>
+  <span class="kd">var</span> <span class="nx">fooView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Foo</span><span class="p">({</span><span class="nx">model</span><span class="o">:</span><span class="nx">foo</span><span class="p">});</span>
+  <span class="nx">fooView</span><span class="p">.</span><span class="nx">render</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+
+<h2>Models</h2>
+
+<p>From the Backbone.js website:</p>
+
+<blockquote><p>Models are the heart of any JavaScript application, containing the interactive data as well as a large part of the logic surrounding it: conversions, validations, computed properties, and access control.</p></blockquote>
+
+<h3>Basic Operations (CRUD)</h3>
+
+<p>The central attribute of a <strong>Model</strong> is its <code>id</code>, the model's unique identifier. When using a REST backend it will typically be used to generate the URLs, possibly in conjunction with the <code>urlRoot</code> attribute, for reads and updates.</p>
+
+<p>For example, if our REST server has a <em>foo</em> resource at</p>
+
+<pre><code>/foos/123
+</code></pre>
+
+<p>and the JSON representation:</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="p">{</span>
+  <span class="nx">created_at</span><span class="o">:</span> <span class="s2">&quot;2012-06-05T22:33:33.859000&quot;</span><span class="p">,</span>
+  <span class="nx">id</span><span class="o">:</span> <span class="s2">&quot;123&quot;</span><span class="p">,</span>
+  <span class="nx">title</span><span class="o">:</span> <span class="s2">&quot;A Special Foo&quot;</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+
+<p>Than <code>model.fetch()</code></p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">App</span><span class="p">.</span><span class="nx">Models</span><span class="p">.</span><span class="nx">Foo</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({});</span>
+<span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="nx">App</span><span class="p">.</span><span class="nx">Models</span><span class="p">.</span><span class="nx">Foo</span><span class="p">({</span><span class="nx">urlRoot</span> <span class="o">:</span> <span class="s1">&#39;/foos&#39;</span><span class="p">,</span> <span class="nx">id</span><span class="o">:</span><span class="s1">&#39;123&#39;</span><span class="p">});</span>
+<span class="nx">foo</span><span class="p">.</span><span class="nx">fetch</span><span class="p">();</span>
+</code></pre>
+</div>
+
+
+<p>will perform, by default, an HTTP <code>GET</code> request at <em>/foos/123</em> and fill the model with the data returned from the server while <code>model.destroy()</code></p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">foo</span><span class="p">.</span><span class="nx">destroy</span><span class="p">({</span><span class="nx">wait</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
+</code></pre>
+</div>
+
+
+<p>will send an HTTP <code>DELETE</code> request to the same URL. The <code>wait</code> attribute tells Backbone to wait for the server to successfully acknowledge the action before actually deleting the model and triggering the <code>'destroy'</code> event. Finally, <code>model.save()</code></p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">foo</span><span class="p">.</span><span class="nx">save</span><span class="p">({</span><span class="nx">title</span><span class="o">:</span><span class="s1">&#39;A New Title&#39;</span><span class="p">,</span> <span class="nx">wait</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
+</code></pre>
+</div>
+
+
+<p>will issue an HTTP <code>PUT</code> request at <em>/foos/123</em> containing <strong>all of the model's attributes</strong> - a complete representation of the resource, not just the attributes that were modified.</p>
+
+<p>If this model was not previously saved or otherwise fetched from the server, than the <code>model.isNew()</code> method will return <em>true</em> and <code>save</code> will instead issue an HTTP <code>POST</code> to <em>/foos</em> (in this case, the <code>urlRoot</code>). This is because Backbone assumes that a new resource is to be created on the server instead of updating an existing one.</p>
+
+<h3>Overrides</h3>
+
+<p>Changing default behaviors is usually easy in Backbone, for example, to make the model's save method use an HTTP <code>PATCH</code> request instead:</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">App</span><span class="p">.</span><span class="nx">Models</span><span class="p">.</span><span class="nx">Foo</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">save</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">attributes</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">options</span> <span class="o">||</span> <span class="p">(</span><span class="nx">options</span> <span class="o">=</span> <span class="p">{});</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">isNew</span><span class="p">())</span>
+      <span class="nx">options</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;PATCH&#39;</span><span class="p">;</span>
+  <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">save</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">attributes</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+
+<p>And this change would be in effect only for this specific model.</p>
+
+<p>Another useful little trick is that, if necessary, the <strong>key</strong> for the model's <code>id</code> can be easily replaced:</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">App</span><span class="p">.</span><span class="nx">Models</span><span class="p">.</span><span class="nx">Foo</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">idAttribute</span><span class="o">:</span> <span class="s1">&#39;_id&#39;</span><span class="p">,</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+
+<p>This is useful if dealing with JSON generated from a database that stores ids under a different name (e.g. the default mongo document <a href="http://www.mongodb.org/display/DOCS/Object+IDs">_id field</a>).</p>
+
+<h3>Defaults &amp; Initializations</h3>
+
+<p>Sometimes it is necessary or desirable to have default attribute values for a model that may be used to pre-fill it common or temporary values. The default attributes are usually set using the <code>defaults</code> hash:</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">App</span><span class="p">.</span><span class="nx">Models</span><span class="p">.</span><span class="nx">Foo</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">defaults</span><span class="o">:</span> <span class="p">{</span>
+    <span class="nx">created_at</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">toISOString</span><span class="p">(),</span>
+    <span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;Default Title&#39;</span> 
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+
+<p>Additionally it is also possible to define an <code>initialize</code> function that will be invoked when the model is created.</p>
+
+<h2>Events</h2>
+
+<p>Backbone has a built-in events module consisting of only three methods. The first is <code>on</code> or <code>bind</code> and is used to bind a callback function to an object (usually a Backbone model/collection but any JS object can be extended with Backbone events) to be invoked when an event is fired:</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="c1">// if book is not a Backbone object</span>
+<span class="nx">_</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">foo</span><span class="p">,</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Events</span><span class="p">);</span>
+<span class="c1">// on title change, render</span>
+<span class="nx">foo</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;change&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">render</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+<span class="c1">// equivalent to</span>
+<span class="nx">foo</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="s1">&#39;change&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">render</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+<span class="c1">// the context argument is optional</span>
+<span class="nx">foo</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;destroy&#39;</span><span class="p">,</span> <span class="nx">fooDestroyedCallback</span><span class="p">);</span>
+</code></pre>
+</div>
+
+
+<p>When the event 'change' happens in the foo object, the this.render() function will be called with <code>this</code> as its context. Thus also solving the problem of "losing" <code>this</code> in callbacks.</p>
+
+<p>Removing callbacks from objects is done using the <code>off</code> method:</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="c1">// remove this.render callback function from &#39;change&#39; event</span>
+<span class="nx">foo</span><span class="p">.</span><span class="nx">off</span><span class="p">(</span><span class="s1">&#39;change&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">render</span><span class="p">);</span>
+<span class="c1">// Removes all &#39;change&#39; callbacks.</span>
+<span class="nx">foo</span><span class="p">.</span><span class="nx">off</span><span class="p">(</span><span class="s1">&#39;change&#39;</span><span class="p">);</span>
+<span class="c1">// Remove the this.render callback for all events</span>
+<span class="nx">foo</span><span class="p">.</span><span class="nx">off</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">render</span><span class="p">);</span>
+<span class="c1">// Remove all callbacks for this context on all events</span>
+<span class="nx">foo</span><span class="p">.</span><span class="nx">off</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+<span class="c1">// Remove all callbacks for the object</span>
+<span class="nx">foo</span><span class="p">.</span><span class="nx">off</span><span class="p">();</span>
+</code></pre>
+</div>
+
+
+<p>The final piece of the Backbone.Events module is <code>trigger</code>:</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">foo</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;change&#39;</span><span class="p">);</span>
+<span class="nx">foo</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;change delete end&#39;</span><span class="p">);</span>
+<span class="nx">foo</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;change&#39;</span><span class="p">,</span> <span class="nx">arg1</span><span class="p">,</span> <span class="nx">arg2</span><span class="p">);</span>
+</code></pre>
+</div>
+
+
+<p>which simply triggers the callback for an event or list of events and optionally passes arguments to the event callbacks.</p>
+
+<p>Something to keep in mind is that the classes Backbone.Model, Backbone.View, Backbone.Collection and Backbone.Router all inherit Backbone.Events properties via <code>_.extend</code>.</p>
+
+<h2>Views</h2>
+
+<p>The View is responsible for handling interface logic. It will have a <code>render</code> function which will take a template, supply it with data and insert it into the page or more accurately, into a DOM element in the page. Commonly, it will also map DOM/UI events (e.g.: user clicked on a button) to data/API functions (e.g. save changed model) and data/API events (e.g. , model data changed) to view methods (re-render the model's DOM element).</p>
+
+<p>It is normal for a model to have multiple views associated with it. The reverse is not so common and is usually achieved via a super-view that contains sub-views for each model.</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">App</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Foo</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">className</span><span class="o">:</span> <span class="s1">&#39;foo-item&#39;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="nx">Handlebars</span><span class="p">.</span><span class="nx">templates</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span>
+
+  <span class="nx">initialize</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// call render() when model data changes</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">model</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="s1">&#39;change&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">render</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+    <span class="c1">// remove this view from the page when model is destroyed</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">model</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="s1">&#39;destroy&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">remove</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+  <span class="p">},</span>
+
+  <span class="c1">// DOM events for a Foo View</span>
+  <span class="nx">events</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s1">&#39;click .button-edit&#39;</span><span class="o">:</span>   <span class="s1">&#39;edit&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;click .button-delete&#39;</span><span class="o">:</span> <span class="s1">&#39;destroy&#39;</span>
+  <span class="p">},</span>
+
+  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// model.toJSON() converts the model attributes to JSON</span>
+    <span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">model</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">();</span>
+    <span class="c1">// fill template with model data and insert into DOM</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">html</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">template</span><span class="p">(</span><span class="nx">data</span><span class="p">));</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
+  <span class="p">},</span>
+
+  <span class="nx">edit</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">input</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.edit&#39;</span><span class="p">).</span><span class="nx">value</span><span class="p">();</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">model</span><span class="p">.</span><span class="nx">save</span><span class="p">({</span><span class="nx">prop</span><span class="o">:</span> <span class="nx">input</span><span class="p">});</span>
+  <span class="p">},</span>
+
+    <span class="nx">destroy</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">model</span><span class="p">.</span><span class="nx">destroy</span><span class="p">({</span><span class="nx">wait</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+
+<p>The central parts of this view are:</p>
+
+<ul>
+<li><strong>initialize</strong> - associate model (or collection) events to their respective callbacks and perform any other initializations  necessary;</li>
+<li><strong>events</strong> - where callbacks for DOM events, usually view methods, are associated with their respective events;</li>
+<li><strong>render</strong> - create HTML and insert it into the DOM.</li>
+</ul>
+
+
+<p>Every view has an <code>el</code> which is the DOM element associated with. It will <em>listen</em> for events within it. This DOM element can already exist within the DOM or may be inserted after the view is created. <code>el</code> is created from the view's <code>tagName</code> (default, <code>div</code>), <code>className</code> and <code>id</code> attributes. So</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">className</span><span class="o">:</span> <span class="s2">&quot;foo-item&quot;</span>
+</code></pre>
+</div>
+
+
+<p>results in the DOM element</p>
+
+<div class="highlight"><pre><code class="html"><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;foo-item&quot;</span><span class="nt">&gt;</span>
+</code></pre>
+</div>
+
+
+<p>There is also a convenience <code>$el</code> jQuery object. The other useful shortcut is the <code>remove()</code> method which removes the view from the DOM - short for <code>$(view.el).remove()</code>.</p>
+
+<h2>Templates</h2>
+
+<p>Handlebars templates are just HTML with embedded expressions. So, assuming there is a template</p>
+
+<pre><code>js/templates/foo.handlebars
+</code></pre>
+
+<p>like this:</p>
+
+<div class="highlight"><pre><code class="html"><span class="nt">&lt;h3&gt;</span>{{ title }}<span class="nt">&lt;/h3&gt;</span>
+{{ created_at }
+
+<span class="nt">&lt;button</span> <span class="na">class=</span><span class="s">&quot;.button-edit&quot;</span><span class="nt">&gt;</span>delete<span class="nt">&lt;/button&gt;</span>
+<span class="nt">&lt;button</span> <span class="na">class=</span><span class="s">&quot;.button-delete&quot;</span><span class="nt">&gt;</span>delete<span class="nt">&lt;/button&gt;</span>
+</code></pre>
+</div>
+
+
+<p>which was created to present (and manipulate) data from a model like this</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">App</span><span class="p">.</span><span class="nx">Models</span><span class="p">.</span><span class="nx">Foo</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">defaults</span><span class="o">:</span> <span class="p">{</span>
+    <span class="nx">created_at</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">toISOString</span><span class="p">(),</span>
+    <span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;Default Title&#39;</span> 
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+
+<p>Than it is necessary to have a View to connect them</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">App</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Foo</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="nx">Handlebars</span><span class="p">.</span><span class="nx">templates</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">],</span>
+  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">model</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">();</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">html</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">template</span><span class="p">(</span><span class="nx">data</span><span class="p">));</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+
+<p>Than it's just a matter of calling something like</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="kd">var</span> <span class="nx">fooView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Foo</span><span class="p">({</span><span class="nx">model</span><span class="o">:</span><span class="nx">foo</span><span class="p">});</span>
+<span class="nx">fooView</span><span class="p">.</span><span class="nx">render</span><span class="p">();</span>
+</code></pre>
+</div>
+
+
+<p>from somewhere - e.g. the router or even a collection view.</p>
+
+<p>In this example, <code>model.toJSON()</code> returns a JSON copy of the model's attributes, for example (assuming we fetched the model from somewhere)</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="p">{</span>
+  <span class="nx">created_at</span><span class="o">:</span> <span class="s2">&quot;2012-06-05T22:33:33.859000&quot;</span><span class="p">,</span>
+    <span class="nx">id</span><span class="o">:</span> <span class="s2">&quot;123&quot;</span><span class="p">,</span>
+  <span class="nx">title</span><span class="o">:</span> <span class="s2">&quot;A Special Foo&quot;</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+
+<p>Handlebars takes that JSON and "fills" the template so that where</p>
+
+<div class="highlight"><pre><code class="html"><span class="nt">&lt;h3&gt;</span>{{ title }}<span class="nt">&lt;/h3&gt;</span>
+</code></pre>
+</div>
+
+
+<p>occurs in the template,</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">template</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+</code></pre>
+</div>
+
+
+<p>will instead have</p>
+
+<div class="highlight"><pre><code class="html"><span class="nt">&lt;h3&gt;</span>A Special Foo<span class="nt">&lt;/h3&gt;</span>
+</code></pre>
+</div>
+
+
+<p>Aside from simply replacing variables, Handlebars templates support other expressions such <code>list</code>, <code>with</code>, <code>each</code>, <code>if</code> and <code>unless</code>.</p>
+
+<h2>Collections</h2>
+
+<p>A Backbone Collection is described simply as an <strong>ordered set of models</strong>. Backbone collections mirror the typical server-side collections. For example, if there was a <em>Task</em> model, than perhaps all of a user's tasks could be represented as a collection of <em>Task</em> and the list could be accessible at <em>/tasks</em> while an individual task would be available at <em>/task/[id]</em>.</p>
+
+<p>It's important to keep in mind that <strong>any event triggered by a model in a collection will also be triggered on the collection</strong>. So if a model in a collection is modified, a <code>change</code> event is triggered and can be handled there but it also <strong> <em>bubbles up</em> </strong> to the collection.</p>
+
+<p>The skeleton for a collection is very straight forward</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">App</span><span class="p">.</span><span class="nx">Collections</span><span class="p">.</span><span class="nx">Foos</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Collection</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">model</span><span class="o">:</span> <span class="nx">App</span><span class="p">.</span><span class="nx">Models</span><span class="p">.</span><span class="nx">Foo</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+
+<h3>Basic Operations</h3>
+
+<p>Instead of expressly using the model's <code>urlRoot</code> parameter, an application typically uses <strong>instead</strong> the collection's <code>url</code> parameter and the models in the collection will construct their URLs from it.</p>
+
+<p>For example, if our server has a collection at /foos</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="p">{</span>
+  <span class="p">{</span>
+    <span class="nx">created_at</span><span class="o">:</span> <span class="s2">&quot;2012-06-05T22:33:33.859000&quot;</span><span class="p">,</span>
+    <span class="nx">id</span><span class="o">:</span> <span class="s2">&quot;123&quot;</span><span class="p">,</span>
+    <span class="nx">title</span><span class="o">:</span> <span class="s2">&quot;A Special Foo&quot;</span>
+  <span class="p">}</span>
+  <span class="p">{</span>
+    <span class="nx">created_at</span><span class="o">:</span> <span class="s2">&quot;2012-06-05T23:12:23.682000&quot;</span><span class="p">,</span>
+    <span class="nx">id</span><span class="o">:</span> <span class="s2">&quot;124&quot;</span><span class="p">,</span>
+    <span class="nx">title</span><span class="o">:</span> <span class="s2">&quot;Another Foo&quot;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+
+<p>Than <code>collection.fetch()</code></p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">foos</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">.</span><span class="nx">Collections</span><span class="p">.</span><span class="nx">Foos</span><span class="p">({</span><span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;/foos&#39;</span><span class="p">});</span>
+<span class="nx">foos</span><span class="p">.</span><span class="nx">fetch</span><span class="p">();</span>
+</code></pre>
+</div>
+
+
+<p>will perform an HTTP GET at /foos, retrieving that set of models. The App.Collections.Foos instance <strong>will be reset</strong> and a <code>reset</code> event triggered (that might be handled by the view). The <code>add</code> parameter is used to add new models <strong>instead of replacing</strong> the entire collection</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">foos</span><span class="p">.</span><span class="nx">fetch</span><span class="p">({</span><span class="nx">add</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
+</code></pre>
+</div>
+
+
+<p><strong><a href="http://api.jquery.com/jQuery.ajax/">jQuery.ajax</a> options can also be passed directly as fetch options</strong>:</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">foos</span><span class="p">.</span><span class="nx">fetch</span><span class="p">({</span><span class="nx">data</span><span class="o">:</span> <span class="p">{</span><span class="nx">page</span><span class="o">:</span> <span class="mi">5</span><span class="p">,</span> <span class="nx">per_page</span><span class="o">:</span> <span class="mi">100</span><span class="p">}})</span>
+</code></pre>
+</div>
+
+
+<p>which means the HTTP <code>GET</code> request will have two parameters, <code>page</code> and <code>per_page</code>, with the specified values.</p>
+
+<p>While a Backbone collection <strong>can</strong> be a local (usually, partial) copy of a server collection, there is, in general, no default automatic synchronization going on between them outside the use of <code>collection.fetch()</code>.</p>
+
+<p>In other words, adding to and removing from a Backbone collection has <strong>no effect</strong> on the server.</p>
+
+<p>The <code>collection.create()</code> method is an exception. It is a convenience method that creates a new instance of a model, saves it to the server and adds it to the collection.</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">foos</span><span class="p">.</span><span class="nx">create</span><span class="p">({</span><span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;Yet more Foo&#39;</span><span class="p">},</span> <span class="p">{</span><span class="nx">wait</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
+</code></pre>
+</div>
+
+
+<p>It is conceptually equivalent to using <code>model.save()</code> and <code>collection.add()</code> in the sense that will perform the <code>create</code> (HTTP <code>POST</code>), wait for confirmation because of the <code>wait</code> parameter, and then add the model to the collection triggering an <code>add</code> event in it.</p>
+
+<p><code>collection.remove()</code> will perform the opposite operation from <code>collection.add()</code> triggering instead a <code>remove</code> event. There is no shortcut for performing a <code>model.destroy</code> and a <code>collection.remove()</code> per se but <code>model.destroy()</code> will have the same effect except it will trigger a <code>destroy</code> event in the collection (bubbled up from the model).</p>
+
+<h3>Set Operations</h3>
+
+<p>The number of models in a collection can be counted using <code>collection.length()</code>. A model in a collection can be obtained using its position in the collection through <code>collection.at()</code>. A model can also be obtained using its <code>id</code> via <code>collection.get()</code>.</p>
+
+<p><code>collection.push()</code> and <code>collection.pop()</code> respectively add to and remove from the end of the collection while <code>collection.unshift()</code> and <code>collection.shift()</code> perform the same tasks at the beginning of the collection.</p>
+
+<p>The Underscore.js library provides many utility functions, many of them aimed at <em>functional programming</em>. Many of these are especially useful when dealing with collections, namely the famous <strong>map</strong>, <strong>reduce</strong>, <strong>filter</strong>:</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="c1">// obtain an array of all titles</span>
+<span class="kd">var</span> <span class="nx">titles</span> <span class="o">=</span> <span class="nx">foos</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">foo</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">foo</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+
+<h3>Sorting</h3>
+
+<p>If a comparator function is defined, it will be used to keep the collection sorted:</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">App</span><span class="p">.</span><span class="nx">Collections</span><span class="p">.</span><span class="nx">Foos</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Collection</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">model</span><span class="o">:</span> <span class="nx">App</span><span class="p">.</span><span class="nx">Models</span><span class="p">.</span><span class="nx">Foo</span><span class="p">,</span>
+
+  <span class="c1">// sort by reverse date_added (last added first)</span>
+  <span class="nx">comparator</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">foo</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">d</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nx">foo</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;date_added&#39;</span><span class="p">));</span>
+    <span class="k">return</span> <span class="o">-</span><span class="nx">d</span><span class="p">.</span><span class="nx">valueOf</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+
+<p>Or the alternative that takes two parameters:</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">foos</span><span class="p">.</span><span class="nx">comparator</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">da</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nx">foo</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;date_added&#39;</span><span class="p">));</span>
+  <span class="kd">var</span> <span class="nx">db</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nx">foo</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;date_added&#39;</span><span class="p">));</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="nx">da</span> <span class="o">&lt;</span> <span class="nx">db</span><span class="p">)</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">da</span> <span class="o">&gt;</span> <span class="nx">db</span><span class="p">)</span>
+    <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>  
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>  
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+
+<h2>Grunt</h2>
+
+<blockquote><p>Grunt is a task-based command line build tool for JavaScript projects.</p></blockquote>
+
+<p>What are the main things Grunt will do in our project?</p>
+
+<ul>
+<li><strong>Compile Handlebars Templates</strong> into JavaScript;</li>
+<li><strong>Concatenate</strong> multiple JavaScript files into a single big file;</li>
+<li><strong>Minify JavaScript</strong>,</li>
+<li><strong>Minify CSS or LESS</strong>.</li>
+</ul>
+
+
+<p>Each of those is called a Grunt <code>task</code>. Each <code>task</code> can have multiple <code>targets</code>. For example, a <em>dist</em> target for deployment and a <em>dev</em> target for development.</p>
+
+<p>There will be <code>grunt.js</code> file in your project directory that <em>knows</em> how to perform these actions with the correct paths, options and order. When you need to run (test, deploy, …) the code, just type <code>grunt</code> in the project directory and the application will be ready to be deployed or run in the localhost.</p>
+
+<p>The following is an example of a <code>grunt.js</code> file:</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">grunt</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">grunt</span><span class="p">.</span><span class="nx">loadNpmTasks</span><span class="p">(</span><span class="s1">&#39;grunt-contrib&#39;</span><span class="p">);</span>  <span class="c1">// grunt-contrib line, remove if not using it</span>
+  <span class="nx">grunt</span><span class="p">.</span><span class="nx">initConfig</span><span class="p">({</span>
+    <span class="c1">// COMPILE HANDLEBARS TEMPLATES</span>
+    <span class="nx">handlebars</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">dist</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">files</span><span class="o">:</span> <span class="p">{</span>
+          <span class="s1">&#39;../static/js/templates.js&#39;</span><span class="o">:</span> <span class="s1">&#39;js/templates/*.handlebars&#39;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="c1">// CONCAT</span>
+    <span class="nx">concat</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">dist</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">src</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;../static/js/templates.js&#39;</span><span class="p">,</span> <span class="s1">&#39;js/app.js&#39;</span><span class="p">,</span> <span class="s1">&#39;js/models/*.js&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;js/collections/*.js&#39;</span><span class="p">,</span> <span class="s1">&#39;js/views/*.js&#39;</span><span class="p">,</span> <span class="s1">&#39;js/routers/router.js&#39;</span><span class="p">],</span>
+        <span class="nx">dest</span><span class="o">:</span> <span class="s1">&#39;../static/js/foo.js&#39;</span><span class="p">,</span>
+        <span class="nx">separator</span><span class="o">:</span> <span class="s1">&#39;;&#39;</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="c1">// MINIFY JAVASCRIPT</span>
+    <span class="nx">min</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">dist</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">src</span><span class="o">:</span> <span class="s1">&#39;../static/js/foo.js&#39;</span><span class="p">,</span>
+        <span class="nx">dest</span><span class="o">:</span> <span class="s1">&#39;../static/js/foo.min.js&#39;</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="c1">// MINIFY CSS</span>
+    <span class="nx">mincss</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">dist</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">files</span><span class="o">:</span> <span class="p">{</span>
+          <span class="s1">&#39;../static/css/foo.css&#39;</span><span class="o">:</span> <span class="s1">&#39;css/*.css&#39;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">});</span>
+  <span class="c1">// DEFAULT TASK (executed on `grunt` without opts) </span>
+  <span class="nx">grunt</span><span class="p">.</span><span class="nx">registerTask</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="s1">&#39;handlebars concat min mincss&#39;</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre>
+</div>
+
+
+<h3>Compiling Templates</h3>
+
+<p>Recently, I made modified @tbranyen's <a href="https://github.com/gruntjs/grunt-contrib">grunt-contrib</a>) grunt task for compiling handlebars templates. It's available at <a href="https://github.com/lrei/grunt-handlebars">my github</a> if you want to use it.</p>
+
+<p>Otherwise, manually compiling the templates is extremely easy:</p>
+
+<pre><code>handlebars --output example.js example.handlebars
+</code></pre>
+
+<h2>More on Requests &amp; Responses</h2>
+
+<h3>Backbone.Sync</h3>
+
+<blockquote><p>Backbone.sync is the function that Backbone calls every time it attempts to read or save a model to the server. By default, it uses (jQuery/Zepto).ajax to make a RESTful JSON request and returns a <a href="http://api.jquery.com/jQuery.ajax/#jqXHR">jqXHR</a>. You can override it in order to use a different persistence strategy, such as WebSockets, XML transport, or Local Storage.</p></blockquote>
+
+<p>For an example of how to completely replace Backbone.sync with Local Storage, see <a href="http://documentcloud.github.com/backbone/docs/backbone-localstorage.html">backbone-localstorage.js</a>.</p>
+
+<p>The default map from CRUD to HTTP is kept in Backbone's methodMap:</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="c1">// Map from CRUD to HTTP for our default `Backbone.sync` implementation.</span>
+<span class="kd">var</span> <span class="nx">methodMap</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s1">&#39;create&#39;</span><span class="o">:</span> <span class="s1">&#39;POST&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;update&#39;</span><span class="o">:</span> <span class="s1">&#39;PUT&#39;</span>
+  <span class="s1">&#39;delete&#39;</span><span class="o">:</span> <span class="s1">&#39;DELETE&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;read&#39;</span><span class="o">:</span>   <span class="s1">&#39;GET&#39;</span>
+<span class="p">};</span>
+</code></pre>
+</div>
+
+
+<p>To save (create or update) a model, Backbone.sync will call $.ajax with the appropriate <code>method</code> (<code>POST</code> or <code>PUT</code>), pass it the model's attributes serialized as JSON as the <code>body</code> and set the request's <code>Content-Type</code> header to <code>application/json</code>.</p>
+
+<h3>Parsing Responses</h3>
+
+<p>When a response arrives from the server, the <code>parse</code> method is called. For models, it converts a response into the hash of attributes to be <code>set</code> on the model. For collections, it converts the a response into a list of models that are added to the collection.</p>
+
+<p>Sometimes, it is useful to override this method, such as when the server response HTTP header contains more useful information aside from the actual model or collection. This parse function</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">parse</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">resp</span><span class="p">,</span> <span class="nx">xhr</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">linkHeader</span> <span class="o">=</span> <span class="nx">xhr</span><span class="p">.</span><span class="nx">getResponseHeader</span><span class="p">(</span><span class="s1">&#39;Link&#39;</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">links</span> <span class="o">=</span> <span class="nx">linkHeader</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">);</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">ii</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">ii</span> <span class="o">&lt;</span> <span class="nx">links</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">ii</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">links</span><span class="p">[</span><span class="nx">ii</span><span class="p">].</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">&#39;rel=&quot;cur&quot;&#39;</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">currentPage</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="sr">/page=(\d+)/</span><span class="p">.</span><span class="nx">exec</span><span class="p">(</span><span class="nx">links</span><span class="p">[</span><span class="nx">ii</span><span class="p">])[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">10</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">links</span><span class="p">[</span><span class="nx">ii</span><span class="p">].</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">&#39;rel=&quot;last&quot;&#39;</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">lastPage</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="sr">/page=(\d+)/</span><span class="p">.</span><span class="nx">exec</span><span class="p">(</span><span class="nx">links</span><span class="p">[</span><span class="nx">ii</span><span class="p">])[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">10</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nx">resp</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+
+<p>will parse a server response which contains a "Link" field on the HTTP header like this:</p>
+
+<pre><code>Link:&lt;http://example.org/foos?page=2&gt;; rel="cur", &lt;http://example.org/foos?page=2&gt;; rel="last", &lt;http://example.org/foos?page=1&gt;; rel="first", &lt;http://example.org/foos?page=1&gt;; rel="prev"
+</code></pre>
+
+<p>and extract the current and last page's index values.</p>
+
+<h3>Bootstraping</h3>
+
+<p>From the Backbone.js documentation:</p>
+
+<blockquote><p>When your app first loads, it's common to have a set of initial models that you know you're going to need, in order to render the page. Instead of firing an extra AJAX request to fetch them, a nicer pattern is to have their data already bootstrapped into the page.</p></blockquote>
+
+<p>Bootstrapping data makes a huge difference in the initial load time of a Backbone.js app: instead of downloading the HTML and then making a series of asynchronous requests, the HTML file will already contain all the data necessary. This is usually achieved by having the server-side framework (RoR, Play, Flask, …) <em>render</em> the HTML file with the data inside a <code>script</code> tag:</p>
+
+<div class="highlight"><pre><code class="html">{% if foos %}
+
+  <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span><span class="nt">&gt;</span>
+
+    <span class="kd">var</span> <span class="nx">foosGlobal</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">({{</span> <span class="nx">foos</span><span class="o">|</span><span class="nx">tojson</span><span class="o">|</span><span class="nx">safe</span> <span class="p">}});</span>
+
+  <span class="nt">&lt;/script&gt;</span>
+
+{% endif %}
+</code></pre>
+</div>
+
+
+<p>In this case I'm using a <a href="http://jinja.pocoo.org">Jinja2</a> template to create an "index.html" file with a <code>script</code> tag that creates a global variable containing the array of objects that will then be used to initialize our collection</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="kd">var</span> <span class="nx">foosView</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">foos</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">.</span><span class="nx">Collections</span><span class="p">.</span><span class="nx">Foos</span><span class="p">();</span>
+
+<span class="c1">// check if bootstrapped </span>
+<span class="k">if</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">foosGlobal</span> <span class="o">&amp;&amp;</span> <span class="nx">foosGlobal</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// bootstrapped</span>
+  <span class="nx">foos</span><span class="p">.</span><span class="nx">reset</span><span class="p">(</span><span class="nx">foosGlobal</span><span class="p">);</span>  <span class="c1">// use bootstrapped data</span>
+  <span class="nx">foosGlobal</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>      <span class="c1">// marks the bootstrapped data as &quot;used&quot;</span>
+<span class="p">}</span>
+<span class="k">else</span> <span class="p">{</span>
+  <span class="c1">// not bootstrapped</span>
+  <span class="nx">foos</span><span class="p">.</span><span class="nx">fetch</span><span class="p">();</span>   <span class="c1">// fetch data</span>
+<span class="p">}</span>
+<span class="c1">// Create &amp; Render view</span>
+<span class="nx">foosView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Foos</span><span class="p">({</span><span class="nx">collection</span><span class="o">:</span> <span class="nx">foos</span><span class="p">});</span>
+<span class="nx">foosView</span><span class="p">.</span><span class="nx">render</span><span class="p">();</span>
+</code></pre>
+</div>
+
+
+<h3>PushState</h3>
+
+<p>Passing <code>pushState: true</code> to the <code>Backbone.history.start()</code> call</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">Backbone</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">start</span><span class="p">({</span><span class="nx">pushState</span><span class="o">:</span> <span class="kc">true</span><span class="p">})</span>
+</code></pre>
+</div>
+
+
+<p>switches from using hash-based URL fragments like</p>
+
+<pre><code>http://www.example.com/#foos
+</code></pre>
+
+<p>to "<em>real</em>" URLs like</p>
+
+<pre><code>http://www.example.com/foos
+</code></pre>
+
+<p>Now, however, <strong>the web server must be able to serve that page, if the browser visits that URL directly.</strong></p>
+
+<p>But that makes it even easier/cleaner to integrate with a server-side framework and bootstrap the data needed by that page. If the user requests</p>
+
+<pre><code>http://www.example.com/foos/123
+</code></pre>
+
+<p>the server-side framework  can serve the page with that exact resource, <em>foo 123</em>, bootstrapped in.</p>
+
+<h2>JavaScript Books</h2>
+
+<ul>
+<li>JavaScript: The Definitive Guide by David Flanagan</li>
+<li>JavaScript: The Good Parts by Douglas Crockford</li>
+<li><a href="http://addyosmani.com/resources/essentialjsdesignpatterns/book/">Learning JavaScript Design Patterns</a> by Addy Osmani</li>
+</ul>
+
+
+
+</div>
+
+
+        
+		</div>
+		<!-- FOOTER -->
+		 <div class="footer">
+			
+		 <!-- RSS -->
+		 	<div class="rss">
+			      <a href="http://feeds.feedburner.com/lrei_articles">RSS
+			      </a>
+			 </div>
+			<!-- /RSS -->
+			<div class="footernav">
+				<a href="http://luisrei.com">home</a><br/>
+				<a href="/">article list</a><br/>
+				<a href="https://github.com/lrei/articles/tree/gh-pages"> fork me on github</a>
+			</div>
+		 </div>
+		<!-- /FOOTER -->
+		</div>
+		
+		<!-- /SITE CONTENT -->
+      </div>
+
+
+
+	<!-- Google Analytics -->
+	<script type="text/javascript">
+
+	  var _gaq = _gaq || [];
+	  _gaq.push(['_setAccount', 'UA-7429955-5']);
+	  _gaq.push(['_trackPageview']);
+
+	  (function() {
+	    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	  })();
+	</script>
+	<!-- /Google Analytics -->
+  </body>
+
+</html>

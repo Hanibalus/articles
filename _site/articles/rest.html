@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Designing a RESTful Web API</title>
+    <link href="/shared/css/documentation.css" media="screen" rel="stylesheet" type="text/css">
+    <link href="/shared/css/pygments.css" media="screen" rel="stylesheet" type="text/css">
+	<link href="/stylesheets/screen.css" media="screen" rel="stylesheet" type="text/css">
+
+  </head>
+  
+  <body>
+    <div id="main">
+      <div id="wrapper">
+	
+		<!-- SITE CONTENT -->
+        <div id="content" class="site">
+			<h1>Designing a RESTful Web API</h1>
+			<div class ="metadata">
+			  <div class="author">
+		      <p>
+		       <b>Luis Rei</b><br/>
+				<a href="http://luisrei.com">http://luisrei.com</a> 
+		      </p>
+		    </div>
+		      <div class="author">
+				<p>
+				 me@luisrei.com<br/>
+				 <a href="http://twitter.com/lmrei">@lmrei</a>
+				</p>
+			  </div>
+			  <div class="docdate">
+			    <p><br/>
+				  
+				  26 Feb 2012<br/>
+				  
+			    </p>
+			  </div>
+			</div>
+			<div class="data">
+			
+          <div class="wikistyle">
+
+<p><a href="http://news.ycombinator.com/item?id=3636805">Hacker News Discussion</a></p>
+
+<h2>Purpose, Scope, Miscellaneous</h2>
+
+<p>I decided to write this article to serve as my personal "<em>quick start guide</em>" for designing RESTful Web APIs. As such, this document is concerned with the <em>how</em> rather than the <em>why</em>. For the latter, check the Bibliography.</p>
+
+<h2>Everything is a Resource</h2>
+
+<p>Any interaction of a RESTful API is an interaction with a resource. In fact, the API can be considered simply as mapping and endpoint - or, <strong>resource identifier</strong> (URL) - to a resource. Resources are sources of information, typically documents or services. A user can be thought of as resource and thus has an URL such as in the case of <a href="http://developer.GitHub.com/v3">GitHub</a>:</p>
+
+<pre><code>https://api.github.com/users/lrei
+</code></pre>
+
+<p>Resources can have different <strong>representations</strong>. The above mentioned user has the following JSON representation (partial document):</p>
+
+<pre><code>{
+    "login": "lrei",
+    "created_at": "2008-11-21T14:48:42Z",
+    "name": "Luis Rei",
+    "email": "me@luisrei.com",
+    "id": 35857,
+    "blog": "http://luisrei.com"
+}
+</code></pre>
+
+<h2>Actions: HTTP Verbs and Response Codes</h2>
+
+<p><strong>Resources are Nouns!</strong> This fictional API URL:</p>
+
+<pre><code>http://api.example.com/posts/delete/233/
+</code></pre>
+
+<p>is wrong. It's obvious that <em>delete</em> is an action, not a resource. The way to do perform an action in a RESTful web service is to use HTTP <strong>verbs</strong> or <strong>request methods</strong>:</p>
+
+<table>
+<tr>
+<th>HTTP Verb</th>
+<th>Action (typical usage)</th>
+</tr>
+<tr>
+<td>GET</td>
+<td>retrieves a representation of a resource without side-effects (nothing changes on the server).</td>
+</tr>
+<tr>
+<td>HEAD</td>
+<td>retrieves just the resource meta-information (headers) i.e. same as GET but without the response body - also without side-effects.</td>
+</tr>
+<tr>
+<td>OPTIONS</td>
+<td>returns the actions supported for specified the resource - also without side-effects.</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>creates a resource.</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td>(completely) replaces an existing resource.</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td>partial modification of a resource.</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>deletes a resource.</td>
+</tr>
+</table>
+
+
+<p>When using PUT, POST or PATCH, send the data as a document in the body of the request. Don't use query parameters to alter state. An example from the <a href="http://developer.GitHub.com/v3">GitHub API</a>:</p>
+
+<pre><code>POST https://api.github.com/gists/gists
+{
+    "description": "the description for this gist",
+    "public": true,
+    "files": {
+        "file1.txt": {
+        "content": "String file contents"
+        }
+    }
+    ...
+}
+</code></pre>
+
+<p>There's also a proper way to do <strong>responses</strong>: using the <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html#sec6.1.1">HTTP Response Codes and Reason Phrase</a>. The reply to the previous request includes the following header:</p>
+
+<pre><code>201 Created
+Location: https://api.github.com/gists/1
+</code></pre>
+
+<p>If one were to make the following request afterwards:</p>
+
+<pre><code>GET https://api.github.com/gists/1
+</code></pre>
+
+<p>The expected reply status code would be:</p>
+
+<pre><code>200 OK
+</code></pre>
+
+<p>A RESTful HTTP server application has to return the status code according to the HTTP specification. Returning the created resource in the POST requests' response body is optional, the location of the created resource is not.</p>
+
+<h2>For Everything Else, There Are Headers</h2>
+
+<p>Resources are mapped to URLs, actions are mapped to verbs and the rest goes in the headers.</p>
+
+<h3>Content Negotiation</h3>
+
+<p>Choosing between different representations of the same resource is a matter of using <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec12.html">HTTP content negotiation</a>:</p>
+
+<pre><code>GET https://api.github.com/gists/1
+Accept: application/json
+</code></pre>
+
+<p>to get the JSON representation of a resource and</p>
+
+<pre><code>GET https://api.github.com/gists/1
+Accept: application/xml
+</code></pre>
+
+<p>to get the XML representation of the same resource. The responses  for this example requests were:</p>
+
+<pre><code>200 OK
+Content-Type: application/json; charset=utf-8
+(response body)
+</code></pre>
+
+<p>because the resource was available in JSON</p>
+
+<pre><code>406 Not Acceptable
+Content-Type: application/json
+{
+"message": "Must ACCEPT application/json: [\"application/xml\"]"
+}
+</code></pre>
+
+<p>because GitHub gists are (currently) not available in XML representation. Notice that the 406 response body can be in whatever representation the server chooses, in this case it was JSON even though the client had requested something else (e.g. XML).</p>
+
+<p>More broadly speaking, representation isn't just about file format, it could also be used for compression or to select between different languages:</p>
+
+<pre><code>GET /resource
+Accept-Language: en-US
+Accept-Charset: iso-8859-5
+Accept-Encoding: gzip
+</code></pre>
+
+<p>There's one more big thing that the Accept header can handle for RESTful Web APIs: media type <strong>versioning</strong>. Here's an example (from <a href="http://www.spire.io/docs/api/reference.html">spire.io</a>) that includes both the resource representation and the version of the media type being used:</p>
+
+<pre><code>    Accept: application/vnd.spire-io.session+json;version=1.0
+</code></pre>
+
+<p>When a particular version is no longer supported by the server, the appropriate server response is</p>
+
+<pre><code>415 Media Type Not Supported
+</code></pre>
+
+<h3>Caching</h3>
+
+<p>There are two main HTTP response headers for controlling caching behavior: <strong>Expires</strong> which specifies an absolute expiry time for a cached representation and <strong>Cache-Control</strong> which specifies a relative expiry time using the <em>max-age</em> directive.</p>
+
+<p>Both work in combination with <strong>ETag</strong> (entity tag) which is an identifier, commonly a hash, that changes when the resource changes thereby invalidating cached versions or a <strong>Last-Modified</strong> header which is just the last modified date of the resource.</p>
+
+<p>The request:</p>
+
+<pre><code>GET https://api.github.com/gists/1
+Accept: application/json
+</code></pre>
+
+<p><em>had</em> the reply:</p>
+
+<pre><code>200 OK
+ETag: "2259b5bea67655550030acf98bad4184"
+</code></pre>
+
+<p>and a later request using</p>
+
+<pre><code>GET https://api.github.com/gists/1
+Accept: application/json
+If-None-Match: "2259b5bea67655550030acf98bad4184"
+</code></pre>
+
+<p>will return</p>
+
+<pre><code>304 Not Modified
+</code></pre>
+
+<p>without a response body. The same could be accomplished using Last-Modified/If-Modified-Since headers.</p>
+
+<h3>Authorization</h3>
+
+<p>Trying to create a repo on GitHub:</p>
+
+<pre><code>POST https://api.github.com/user/repos
+</code></pre>
+
+<p>and the reply:</p>
+
+<pre><code>401 Unauthorized
+WWW-Authenticate: Basic realm="GitHub"
+</code></pre>
+
+<p>which means that making a POST request to /user/repos requires basic HTTP authentication which uses the Authorization header with the base64 encoded string "<em>username</em>:<em>password</em>":</p>
+
+<pre><code>POST https://api.github.com/user/repos
+Authorization: Basic bHJlaTp5ZWFocmlnaHQ=
+</code></pre>
+
+<p>Basic HTTP authentication should always be used in combination with SSL/TLS (HTTPS) since otherwise the username/password will be susceptible to interception.</p>
+
+<p><a href="http://oauth.net/2/">OAuth2</a> is a common way of doing authorization for 3rd party applications using an API but beyond the scope of this document.</p>
+
+<h3>Rate Limiting</h3>
+
+<p>HTTP does not currently have any standard for rate limiting. GitHub uses:</p>
+
+<pre><code>GET https://api.github.com/gists/1
+</code></pre>
+
+<p>or any other request which results in the response headers:</p>
+
+<pre><code>200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 4966
+</code></pre>
+
+<p>This indicates that the client is limited to making 5000 API requests/hour and that the client can make 4966 requests during the next hour. By convention, non-standard headers are prefixed with <em>X-</em>.</p>
+
+<p>The most widely known implementation of rate limiting is probably <a href="https://dev.twitter.com/docs/rate-limiting">twitter's</a>. It is similar to GitHub's but also includes a <em>X-RateLimit-Reset</em> which indicates when the limits will be reset. A particular API call or set of API calls may also be subject to additional limits. Twitter implements these with <em>X-FeatureRateLimit-Limit</em>, <em>X-FeatureRateLimit-Remaining</em> and <em>X-FeatureRateLimit-Reset</em>.</p>
+
+<p>When denying a request based on rate limiting, the status code should be 403 Forbidden accompanied by by a message explaining the reason for the rejection.</p>
+
+<h2>HATEOAS, OPTIONS and Error Handling</h2>
+
+<blockquote><p>A REST API <strong>must not</strong> define fixed resource names or hierarchies (an obvious coupling of client and server). Servers <strong>must have</strong> the freedom to control their own namespace (…) Failure here implies that clients are assuming a resource structure due to out-of-band information (…) A REST API <strong>should</strong> be entered with no prior knowledge beyond the initial URI. - <a href="http://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">Roy Thomas Fielding</a> (my emphasis)</p></blockquote>
+
+<p>In other words, in a truly REST based architecture any URL, except the initial URL, can be changed, <strong>even to other servers</strong>, without worrying about the client.</p>
+
+<p>Hypermedia As The Engine Of Application State, HATEOAS, can be reduced to thinking of the API as a state machine where resources are thought of as states and the transitions between states are links between resources and are included in their representation (hypermedia).</p>
+
+<p>The first state is obviously the root URL. So let's start with the root of Spire.io's API:</p>
+
+<pre><code>GET https://api.spire.io
+</code></pre>
+
+<p>results in:</p>
+
+<pre><code>200 OK
+{
+    "url": "https://api.spire.io/",
+    "resources": {
+        "sessions": {
+            "url": "https://api.spire.io/sessions"
+        },
+        "accounts": {
+            "url": "https://api.spire.io/accounts"
+        },
+        "billing": {
+            "url": "https://api.spire.io/billing"
+        }
+    }
+…
+</code></pre>
+
+<p>The root resource, or <em>initial state</em>, contains the transitions to the other resources (or states) reachable from it: "sessions", "accounts" and "billing".</p>
+
+<p>It's also possible to include the transitions in the HTTP response Link header, for example:</p>
+
+<pre><code>GET /gists/starred
+</code></pre>
+
+<p>can result in the following response:</p>
+
+<pre><code>200 OK
+Link: &lt;https://api.github.com/resource?page=2&gt;; rel="next",
+  &lt;https://api.github.com/resource?page=5&gt;; rel="last"
+</code></pre>
+
+<p>In the case of non-hypermedia resources (e.g. images) the http headers will be the only way to add API metadata to the resource such as state transitions. I think it's generally a good idea to always include the transitions in the headers as it becomes possible to perform a transition without parsing the request body.</p>
+
+<h3>Options</h3>
+
+<p>Another useful bit of information is what actions can be performed on a given resource. The way to find that out is to use the HTTP request method OPTIONS:</p>
+
+<pre><code>OPTIONS https://api.spire.io/accounts
+</code></pre>
+
+<p>and the response:</p>
+
+<pre><code>Status Code: 200
+access-control-allow-methods: GET,POST
+access-control-allow-origin: *
+</code></pre>
+
+<p>From the <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html">HTTP/1.1 Method Definitions</a>:</p>
+
+<blockquote><p>A 200 response [to an OPTIONS request] SHOULD include any header fields that indicate optional features implemented by the server and applicable to that resource (e.g., Allow), possibly including extensions not defined by this specification.</p></blockquote>
+
+<p>This seems like a good place to include information about  resource specific rate limits without the need to make a request that will count against such limits.</p>
+
+<h3>Error Handling</h3>
+
+<p>An error response should consist of the following:</p>
+
+<ul>
+<li>The appropriate HTTP error status code and any other relevant headers;</li>
+<li>A human readable message in the appropriate format (including a link to the documentation);</li>
+<li>A <em>Link</em> header to a meaningful state transition if appropriate.</li>
+</ul>
+
+
+<p>An example from the <a href="http://www.twilio.com/docs/api/rest">twilio api</a>:</p>
+
+<pre><code>GET https://api.twilio.com/2010-04-01/Accounts.json
+</code></pre>
+
+<p>results in:</p>
+
+<pre><code>401 Unauthorized
+WWW-Authenticate: Basic realm="Twilio API"
+{
+    "status": 401,
+    "message": "Authenticate",
+    "code": 20003,
+    "more_info": "http:\/\/www.twilio.com\/docs\/errors\/20003"
+}
+</code></pre>
+
+<h2>Bibliography</h2>
+
+<p><a href="http://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm" title="Roy Thomas Fielding: Architectural Styles and the Design of Network-based Software Architectures, Chapter 5: Representational State Transfer (REST)">Architectural Styles and the Design of Network-based Software Architectures, Chapter 5: Representational State Transfer (REST)</a> - R. Fielding</p>
+
+<p><a href="http://roy.gbiv.com/untangled/2009/it-is-okay-to-use-post">It is okay to use POST</a> - R. Fielding</p>
+
+<p><a href="http://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">REST APIs must be hypertext-driven</a> - R. Fielding</p>
+
+<p><a href="http://blog.steveklabnik.com/posts/2011-07-03-nobody-understands-rest-or-http">Nobody Understands REST or HTTP</a> - Steve Klabnik</p>
+
+<p><a href="http://twitter.com/getsomerestbook">Get some REST on twitter</a> - Steve Klabnik</p>
+
+<p><a href="http://blog.steveklabnik.com/posts/2011-07-03-nobody-understands-rest-or-http">Nobody Understands REST or HTTP</a> - Steve Klabnik</p>
+
+<p><a href="http://barelyenough.org/blog/2008/05/versioning-rest-web-services/">Versioning REST Web Services</a> - Peter Williams</p>
+
+<p><a href="http://www.w3.org/Protocols/rfc2616/rfc2616">Hypertext Transfer Protocol -- HTTP/1.1 </a> - R. Fielding, J. Gettys, J. Mogul, H. Frystyk, L. Masinter, P. Leach, T. Berners-Lee</p>
+
+<p><a href="http://tools.ietf.org/html/rfc2617">HTTP Authentication: Basic and Digest Access Authentication</a> - J. Franks, P. Hallam-Baker, J. Hostetler, S. Lawrence, P. Leach, A. Luotonen, L. Stewart</p>
+
+<p><a href="http://www.oreillynet.com/onlamp/blog/2003/12/restful_error_handling.html">RESTful Error Handling</a> - Ethan Cerami</p>
+
+<p><a href="http://www.infoq.com/articles/designing-restful-http-apps-roth">RESTful HTTP in practice</a> - Gregor Roth</p>
+
+<p><a href="http://www.infoq.com/articles/webber-rest-workflow">How To GET a Cup of Coffee</a> - Jim Webber, Savas Parastatidis, Ian Robinson</p>
+
+<p><a href="http://shop.oreilly.com/product/9780596805838.do">REST in Practice</a> (Book) - Jim Webber, Savas Parastatidis, Ian Robinson</p>
+
+<p><a href="http://shop.oreilly.com/product/9780596529260.do">RESTful Web Services</a> (Book) - Leonard Richardson, Sam Ruby</p>
+
+<p><a href="http://shop.oreilly.com/product/9780596801694.do">RESTful Web Services Cookbook</a> (Book) - Subbu Allamaraju</p>
+
+
+</div>
+
+
+        
+		</div>
+		<!-- FOOTER -->
+		 <div class="footer">
+			
+		 <!-- RSS -->
+		 	<div class="rss">
+			      <a href="http://feeds.feedburner.com/lrei_articles">RSS
+			      </a>
+			 </div>
+			<!-- /RSS -->
+			<div class="footernav">
+				<a href="http://luisrei.com">home</a><br/>
+				<a href="/">article list</a><br/>
+				<a href="https://github.com/lrei/articles/tree/gh-pages"> fork me on github</a>
+			</div>
+		 </div>
+		<!-- /FOOTER -->
+		</div>
+		
+		<!-- /SITE CONTENT -->
+      </div>
+
+
+
+	<!-- Google Analytics -->
+	<script type="text/javascript">
+
+	  var _gaq = _gaq || [];
+	  _gaq.push(['_setAccount', 'UA-7429955-5']);
+	  _gaq.push(['_trackPageview']);
+
+	  (function() {
+	    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	  })();
+	</script>
+	<!-- /Google Analytics -->
+  </body>
+
+</html>

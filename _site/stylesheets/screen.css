@@ -1,0 +1,61 @@
+.site .data {
+   margin-top: 2em;
+   clear: left;
+}
+
+.site .metadata p { 
+    margin: 0.5em 0px;
+ }
+
+.site .metadata .author {
+        float: left;
+        margin-right: 3em;
+        
+}
+.site .metadata .docdate {
+    clear: left;
+    color: #aaa;;
+}
+
+ul.posts {
+      
+      margin-top: 2em;
+      margin-left: 2em;
+      margin-bottom: 2em;
+    }
+
+      ul.posts li {
+        line-height: 1.75em;
+      }
+
+      ul.posts span {
+        color: #aaa;
+        font-size: 14px;
+      }
+   
+
+.site .footer {
+  color: #666;
+  border-top: 1px solid #cccccc;
+  margin-top: 2em;
+  overflow: hidden;
+}
+  .site .footer .rss {
+    margin-top: 2em;
+    margin-right: 0px;
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+  }
+
+    .site .footer .rss a {
+      color: black;
+    }
+  .site .footer .footernav {
+      margin-top: 1.1em;
+      margin-right: -.2em;
+      float: left;
+  }
+    .site .footer .fork a {
+      color: #8085C1;
+    }
