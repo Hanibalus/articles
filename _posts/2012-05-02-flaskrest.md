@@ -29,7 +29,7 @@ As a convention in this document, whenever a server response is presented, it is
 
 
 ## Resources
-Let's begin by making a complete app that responds to requests at the root and .
+Let's begin by making a complete app that responds to requests at the root, /articles and /articles/:id.
 {% highlight python %}
 from flask import Flask, url_for
 app = Flask(__name__)

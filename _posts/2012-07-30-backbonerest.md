@@ -1,0 +1,743 @@
+---
+title: Developing REST API Client Applications with JavaScript & Backbone.js
+layout: post
+---
+# An Introduction to Client-Side Web Application Development
+
+## Introduction
+
+[Backbone.js](http://backbonejs.org) is a JavaScript framework for creating single-page web applications. In broad terms this means our application will consist of one HTML file which will be dynamically modified by the JavaScript according to user actions and JSON formatted data from the server. Rendering (converting data to HTML) will be done by the client application.
+
+As the title implies, the main focus focus of this article is on developing rich client-side web applications that interact with REST APIs. That said, I've tried to keep it as general as possible.
+
+Backbone's online [documentation](http://backbonejs.org) and [annotated source code](http://backbonejs.org/docs/backbone.html) are the best places to learn more about Backbone.js. At the time of writing, the whole commented source code is under 1500 lines.
+
+[TodoMVC](http://todomvc.com) provides a good introductory [example](https://github.com/addyosmani/todomvc/tree/master/architecture-examples/backbone) using Local Storage instead of a REST API.
+
+### Libraries
+There are some libraries that provide crucial functionality to a Backbone.js application. The choice of templating library is in large part a personal one. This article uses Handlebars but it can be easily replaced by another.
+
+**[Backbone.js](http://backbonejs.org)**
+> Backbone.js gives structure to web applications by providing models with key-value binding and custom events, collections with a rich API of enumerable functions, views with declarative event handling, and connects it all to your existing API over a RESTful JSON interface.
+
+**[Underscore.js](http://documentcloud.github.com/underscore/)** - the only Backbone.js *hard* dependency
+> Underscore is a utility-belt library for JavaScript that provides a lot of the functional programming support that you would expect in Prototype.js (or Ruby), but without extending any of the built-in JavaScript objects. It's the tie to go along with jQuery's tux, and Backbone.js's suspenders.
+
+**[Handlebars](http://handlebarsjs.com)**
+> Handlebars provides the power necessary to let you build semantic templates effectively with no frustration.
+
+**[jQuery](http://jquery.com)**
+> jQuery is a fast and concise JavaScript Library that simplifies HTML document traversing, event handling, animating, and Ajax interactions for rapid web development.
+
+### Tools
+
+**[Node.js](http://nodejs.org)**
+> Node.js is a platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications.
+
+In this article, Node.js is only used because it is required by the other tools.
+
+**[uglifyjs](https://github.com/mishoo/UglifyJS)**
+> JavaScript parser / mangler / compressor / beautifier library for NodeJS
+
+**[Handlebars Precompiler](http://handlebarsjs.com/precompilation.html)**
+> Using the Handlebars precompiler, you can precompile your Handlebars templates to save time on the client and reduce the required runtime size of the handlebars library.
+
+**[grunt](https://github.com/cowboy/grunt)**
+> A task-based command line build tool for JavaScript projects.
+
+**[RECESS](https://github.com/twitter/recess)**
+ > A simple, attractive code quality tool for CSS built on top of LESS.
+
+RECESS is not actually shown anywhere in this article because no LESS/CSS code in shown but it's used in the actual application development. 
+
+## Application Architecture
+ 
+The client application architecture will consist of the following components:
+
+* **Models** (Backbone.Model): data management;
+* **Collections** (Backbone.Collection): groups of models;
+* **Views** (Backnone.View): user interface logic;
+* **Routers** (Backbone.Router): state management (translate URLs into application state);
+* **Templates** (Handlebars): _"dumb"_ user interface (mostly HTML with variables and basic expressions to access them e.g. `each`).
+
+If you're acquainted with either the [Model-View-Controller](https://en.wikipedia.org/wiki/Model-view-controller) or the [Model-View-Presenter](https://en.wikipedia.org/wiki/Model_View_Presenter) patterns, you will no doubt realize there are similarities. MVP is a better fit if you consider Backbone.View as a Presenter and an external template as a View.
+
+### JavaScript & Directory Structure
+
+The application will be contained in a single namespace. In JavaScript this can be done using Objects and object notation (read more about it in [Learning JavaScript Design Patterns](http://addyosmani.com/resources/essentialjsdesignpatterns/book/#detailnamespacing)):
+
+{% highlight javascript %}
+App = {
+  Models: {},
+  Collections: {},
+  Routers: {},
+  Views: {},
+  init: function() {   },
+}
+{% endhighlight %}
+
+This will be part of our js/app.js and in another file, such as js/models/example.js, we have
+{% highlight javascript %}
+App.Models.Example = Backbone.Model.extend({   });
+{% endhighlight %}
+
+Alternatively, consider using [RequireJS](http://requirejs.org) a JavaScript file and module loader (which I don't use).
+
+The structure for the `source` directory is:
+
+	index.html
+	css/ or less/
+	js/
+    - js/lib: libraries (Backbone, Handlebars, …)
+    - js/models: App.Models.*
+    - js/collections: App.Collections.*
+    - js/views: App.Views.*
+    - js/routers: App.Routers.*
+    - js/templates: Handlebars[*]
+    - js/app.js
+
+And an `assets` directory
+
+	assets/
+    - assets/index.html
+    - assets/css/
+    - assets/js/
+
+The assets/ directory is where the concatenated and minimized JavaScript and compiled LESS or minimized CSS are stored. Its contents are what will be uploaded to the web server and later downloaded by the user via the browser.
+
+The idea is that while developing you separate the your application's JavaScript files according to their *Namespace* and then concatenate (or merge) them together into a single "app.js" file.
+
+## App Init & Router
+
+The `App.init` function is usually run after the DOM is ready i.e. all assets (scripts, stylesheets, images, …) have been downloaded by the client's browser:
+
+{% highlight javascript %}
+$(function() {
+  App.init();
+});
+{% endhighlight %}
+ 
+The application starts by creating a `Router` and enabling routing by calling `Backbone.history.start()` which monitors the browser for URL changes
+
+{% highlight javascript %}
+init: function() {
+  App.router = new App.Routers.Router();
+  Backbone.history.start();
+},
+{% endhighlight %}
+
+A router simply maps a browser URL such as
+
+	http://www.example.com/#directory/shopping
+
+(note the **#** or hash) to a function such as
+
+{% highlight javascript %}
+directory: function(name) {   }
+{% endhighlight %}
+
+
+URL changes will **not trigger page refreshes**, instead they trigger an event that will be handled by the router
+
+{% highlight javascript %}
+App.Routers.Router = Backbone.Router.extend({
+  routes: {
+    '':         'index',	
+    'foo/:id':  'foo'
+  },
+  index: function() {  },
+  foo: function(id) {  }
+});
+{% endhighlight %}
+
+This example router maps URLs such as
+
+	http://www.example.com/#foo/123
+
+to the *foo* function which could look like this
+
+{% highlight javascript %}
+foo: function(id) {
+  var foo = new App.Models.Foo({urlRoot : '/foos', id:id});
+  foo.fetch();
+  var fooView = new App.Views.Foo({model:foo});
+  fooView.render();
+}
+{% endhighlight %}
+
+
+## Models
+From the Backbone.js website:
+
+> Models are the heart of any JavaScript application, containing the interactive data as well as a large part of the logic surrounding it: conversions, validations, computed properties, and access control.
+
+### Basic Operations (CRUD)
+
+The central attribute of a **Model** is its `id`, the model's unique identifier. When using a REST backend it will typically be used to generate the URLs, possibly in conjunction with the `urlRoot` attribute, for reads and updates.
+
+For example, if our REST server has a *foo* resource at
+
+	/foos/123
+
+and the JSON representation:
+
+{% highlight json %}
+{
+  created_at: "2012-06-05T22:33:33.859000",
+  id: "123",
+  title: "A Special Foo"
+}
+{% endhighlight %}
+
+Than `model.fetch()`
+
+{% highlight javascript %}
+App.Models.Foo = Backbone.Model.extend({});
+var foo = App.Models.Foo({urlRoot : '/foos', id:'123'});
+foo.fetch();
+{% endhighlight %}
+
+will perform, by default, an HTTP `GET` request at */foos/123* and fill the model with the data returned from the server while `model.destroy()`
+
+{% highlight javascript %}
+foo.destroy({wait: true});
+{% endhighlight %}
+
+will send an HTTP `DELETE` request to the same URL. The `wait` attribute tells Backbone to wait for the server to successfully acknowledge the action before actually deleting the model and triggering the `'destroy'` event. Finally, `model.save()`
+
+{% highlight javascript %}
+foo.save({title:'A New Title', wait: true});
+{% endhighlight %}
+
+will issue an HTTP `PUT` request at */foos/123* containing **all of the model's attributes** - a complete representation of the resource, not just the attributes that were modified.
+
+If this model was not previously saved or otherwise fetched from the server, than the `model.isNew()` method will return *true* and `save` will instead issue an HTTP `POST` to */foos* (in this case, the `urlRoot`). This is because Backbone assumes that a new resource is to be created on the server instead of updating an existing one.
+
+### Overrides
+
+Changing default behaviors is usually easy in Backbone, for example, to make the model's save method use an HTTP `PATCH` request instead:
+
+{% highlight javascript %}
+App.Models.Foo = Backbone.Model.extend({
+  save: function(attributes, options) {
+    options || (options = {});
+    if (!this.isNew())
+      options['type'] = 'PATCH';
+  Backbone.Model.prototype.save.call(this, attributes, options);
+  }
+});
+{% endhighlight %}
+
+And this change would be in effect only for this specific model.
+
+Another useful little trick is that, if necessary, the **key** for the model's `id` can be easily replaced:
+
+{% highlight javascript %}
+App.Models.Foo = Backbone.Model.extend({
+  idAttribute: '_id',
+});
+{% endhighlight %}
+
+This is useful if dealing with JSON generated from a database that stores ids under a different name (e.g. the default mongo document [_id field](http://www.mongodb.org/display/DOCS/Object+IDs)).
+
+### Defaults & Initializations
+
+Sometimes it is necessary or desirable to have default attribute values for a model that may be used to pre-fill it common or temporary values. The default attributes are usually set using the `defaults` hash:
+
+{% highlight javascript %}
+App.Models.Foo = Backbone.Model.extend({
+  defaults: {
+    created_at: new Date().toISOString(),
+    title: 'Default Title' 
+  }
+});
+{% endhighlight %}
+
+Additionally it is also possible to define an `initialize` function that will be invoked when the model is created.
+
+## Events
+
+Backbone has a built-in events module consisting of only three methods. The first is `on` or `bind` and is used to bind a callback function to an object (usually a Backbone model/collection but any JS object can be extended with Backbone events) to be invoked when an event is fired:  
+
+{% highlight javascript %}
+// if book is not a Backbone object
+_.extend(foo, Backbone.Events);
+// on title change, render
+foo.on('change', this.render, this);
+// equivalent to
+foo.bind('change', this.render, this);
+// the context argument is optional
+foo.on('destroy', fooDestroyedCallback);
+{% endhighlight %}
+
+When the event 'change' happens in the foo object, the this.render() function will be called with `this` as its context. Thus also solving the problem of "losing" `this` in callbacks.
+
+Removing callbacks from objects is done using the `off` method:
+
+{% highlight javascript %}
+// remove this.render callback function from 'change' event
+foo.off('change', this.render);
+// Removes all 'change' callbacks.
+foo.off('change');
+// Remove the this.render callback for all events
+foo.off(null, this.render);
+// Remove all callbacks for this context on all events
+foo.off(null, null, this);
+// Remove all callbacks for the object
+foo.off();
+{% endhighlight %}
+
+The final piece of the Backbone.Events module is `trigger`:
+
+{% highlight javascript %}
+foo.trigger('change');
+foo.trigger('change delete end');
+foo.trigger('change', arg1, arg2);
+{% endhighlight %}
+
+which simply triggers the callback for an event or list of events and optionally passes arguments to the event callbacks.
+
+Something to keep in mind is that the classes Backbone.Model, Backbone.View, Backbone.Collection and Backbone.Router all inherit Backbone.Events properties via `_.extend`.
+
+
+## Views
+The View is responsible for handling interface logic. It will have a `render` function which will take a template, supply it with data and insert it into the page or more accurately, into a DOM element in the page. Commonly, it will also map DOM/UI events (e.g.: user clicked on a button) to data/API functions (e.g. save changed model) and data/API events (e.g. , model data changed) to view methods (re-render the model's DOM element).
+
+It is normal for a model to have multiple views associated with it. The reverse is not so common and is usually achieved via a super-view that contains sub-views for each model.
+
+{% highlight javascript %}
+App.Views.Foo = Backbone.View.extend({
+  className: 'foo-item',
+  template: Handlebars.templates['foo'],
+
+  initialize: function() {
+    // call render() when model data changes
+    this.model.bind('change', this.render, this);
+    // remove this view from the page when model is destroyed
+    this.model.bind('destroy', this.remove, this);
+  },
+
+  // DOM events for a Foo View
+  events: {
+    'click .button-edit':   'edit',
+    'click .button-delete': 'destroy'
+  },
+
+  render: function() {
+    // model.toJSON() converts the model attributes to JSON
+    var data = this.model.toJSON();
+    // fill template with model data and insert into DOM
+    this.$el.html(this.template(data));
+    return this;
+  },
+
+  edit: function() {
+    var input = $('.edit').value();
+    this.model.save({prop: input});
+  },
+
+	destroy: function() {
+    this.model.destroy({wait: true});
+  }
+});
+{% endhighlight %}
+
+The central parts of this view are:
+
+* **initialize** - associate model (or collection) events to their respective callbacks and perform any other initializations  necessary;
+* **events** - where callbacks for DOM events, usually view methods, are associated with their respective events;
+* **render** - create HTML and insert it into the DOM.
+
+Every view has an `el` which is the DOM element associated with. It will *listen* for events within it. This DOM element can already exist within the DOM or may be inserted after the view is created. `el` is created from the view's `tagName` (default, `div`), `className` and `id` attributes. So
+
+{% highlight javascript %}
+className: "foo-item"
+{% endhighlight %}
+
+results in the DOM element
+
+{% highlight html %}
+<div class="foo-item">
+{% endhighlight %}
+
+There is also a convenience `$el` jQuery object. The other useful shortcut is the `remove()` method which removes the view from the DOM - short for `$(view.el).remove()`.
+
+## Templates
+
+Handlebars templates are just HTML with embedded expressions. So, assuming there is a template
+
+	js/templates/foo.handlebars
+
+like this:
+
+{% highlight html %}
+<h3>{{{{ title }}}}</h3>
+{{{{ created_at }}}}
+<button class=".button-edit">delete</button>
+<button class=".button-delete">delete</button>
+{% endhighlight %}
+
+which was created to present (and manipulate) data from a model like this
+
+{% highlight javascript %}
+App.Models.Foo = Backbone.Model.extend({
+  defaults: {
+    created_at: new Date().toISOString(),
+    title: 'Default Title' 
+  }
+});
+{% endhighlight %}
+
+Than it is necessary to have a View to connect them
+
+{% highlight javascript %}
+App.Views.Foo = Backbone.View.extend({
+  template: Handlebars.templates['foo'],
+  render: function() {
+	  var data = this.model.toJSON();
+    this.$el.html(this.template(data));
+});
+{% endhighlight %}
+
+Than it's just a matter of calling something like
+
+{% highlight javascript %}
+var fooView = new App.Views.Foo({model:foo});
+fooView.render();
+{% endhighlight %}
+
+from somewhere - e.g. the router or even a collection view.
+
+In this example, `model.toJSON()` returns a JSON copy of the model's attributes, for example (assuming we fetched the model from somewhere)
+
+{% highlight json %}
+{
+  created_at: "2012-06-05T22:33:33.859000",
+	id: "123",
+  title: "A Special Foo"
+}
+{% endhighlight %}
+
+Handlebars takes that JSON and "fills" the template so that where
+
+{% highlight html %}
+<h3>{{{{ title }}}}</h3>
+{% endhighlight %}
+
+occurs in the template,
+
+{% highlight javascript %}
+template(data);
+{% endhighlight %}
+
+will instead have
+
+{% highlight html %}
+<h3>A Special Foo</h3>
+{% endhighlight %}
+
+Aside from simply replacing variables, Handlebars templates support other expressions such `list`, `with`, `each`, `if` and `unless`.
+
+## Collections
+
+A Backbone Collection is described simply as an **ordered set of models**. Backbone collections mirror the typical server-side collections. For example, if there was a *Task* model, than perhaps all of a user's tasks could be represented as a collection of *Task* and the list could be accessible at */tasks* while an individual task would be available at */task/[id]*.
+
+It's important to keep in mind that **any event triggered by a model in a collection will also be triggered on the collection**. So if a model in a collection is modified, a `change` event is triggered and can be handled there but it also ** *bubbles up* ** to the collection.
+
+The skeleton for a collection is very straight forward
+
+{% highlight javascript %}
+App.Collections.Foos = Backbone.Collection.extend({
+  model: App.Models.Foo
+});
+{% endhighlight %}
+
+### Basic Operations
+
+Instead of expressly using the model's `urlRoot` parameter, an application typically uses **instead** the collection's `url` parameter and the models in the collection will construct their URLs from it.
+
+For example, if our server has a collection at /foos
+
+{% highlight json %}
+{
+  {
+    created_at: "2012-06-05T22:33:33.859000",
+    id: "123",
+    title: "A Special Foo"
+  }
+  {
+    created_at: "2012-06-05T23:12:23.682000",
+    id: "124",
+    title: "Another Foo"
+  }
+}
+{% endhighlight %}
+
+Than `collection.fetch()`
+
+{% highlight javascript %}
+foos = new App.Collections.Foos({url: '/foos'});
+foos.fetch();
+{% endhighlight %}
+
+will perform an HTTP GET at /foos, retrieving that set of models. The App.Collections.Foos instance **will be reset** and a `reset` event triggered (that might be handled by the view). The `add` parameter is used to add new models **instead of replacing** the entire collection
+
+{% highlight javascript %}
+foos.fetch({add: true});
+{% endhighlight %}
+
+**[jQuery.ajax](http://api.jquery.com/jQuery.ajax/) options can also be passed directly as fetch options**:
+
+{% highlight javascript %}
+foos.fetch({data: {page: 5, per_page: 100}})
+{% endhighlight %}
+
+which means the HTTP `GET` request will have two parameters, `page` and `per_page`, with the specified values.
+
+While a Backbone collection **can** be a local (usually, partial) copy of a server collection, there is, in general, no default automatic synchronization going on between them outside the use of `collection.fetch()`.
+
+In other words, adding to and removing from a Backbone collection has **no effect** on the server.
+
+The `collection.create()` method is an exception. It is a convenience method that creates a new instance of a model, saves it to the server and adds it to the collection.
+
+{% highlight javascript %}
+foos.create({title: 'Yet more Foo'}, {wait: true});
+{% endhighlight %}
+
+It is conceptually equivalent to using `model.save()` and `collection.add()` in the sense that will perform the `create` (HTTP `POST`), wait for confirmation because of the `wait` parameter, and then add the model to the collection triggering an `add` event in it.
+
+`collection.remove()` will perform the opposite operation from `collection.add()` triggering instead a `remove` event. There is no shortcut for performing a `model.destroy` and a `collection.remove()` per se but `model.destroy()` will have the same effect except it will trigger a `destroy` event in the collection (bubbled up from the model).
+
+### Set Operations
+
+The number of models in a collection can be counted using `collection.length()`. A model in a collection can be obtained using its position in the collection through `collection.at()`. A model can also be obtained using its `id` via `collection.get()`.
+
+`collection.push()` and `collection.pop()` respectively add to and remove from the end of the collection while `collection.unshift()` and `collection.shift()` perform the same tasks at the beginning of the collection.
+
+The Underscore.js library provides many utility functions, many of them aimed at *functional programming*. Many of these are especially useful when dealing with collections, namely the famous **map**, **reduce**, **filter**:
+
+{% highlight javascript %}
+// obtain an array of all titles
+var titles = foos.map(function(foo) {
+  return foo.get('title');
+});
+{% endhighlight %}
+
+
+### Sorting
+
+If a comparator function is defined, it will be used to keep the collection sorted:
+
+{% highlight javascript %}
+App.Collections.Foos = Backbone.Collection.extend({
+  model: App.Models.Foo,
+
+  // sort by reverse date_added (last added first)
+  comparator: function(foo) {
+    var d = new Date(foo.get('date_added'));
+    return -d.valueOf();
+  }
+});
+{% endhighlight %}
+
+Or the alternative that takes two parameters:
+
+{% highlight javascript %}
+foos.comparator = function(a, b) {
+  var da = new Date(foo.get('date_added'));
+  var db = new Date(foo.get('date_added'));
+
+  if (da < db)
+    return -1;
+  if (da > db)
+    return 1;  
+  return 0;  
+  }
+});
+{% endhighlight %}
+
+
+## Grunt
+> Grunt is a task-based command line build tool for JavaScript projects.
+
+What are the main things Grunt will do in our project?
+
+* **Compile Handlebars Templates** into JavaScript;
+* **Concatenate** multiple JavaScript files into a single big file;
+* **Minify JavaScript**,
+* **Minify CSS or LESS**.
+
+Each of those is called a Grunt `task`. Each `task` can have multiple `targets`. For example, a *dist* target for deployment and a *dev* target for development.
+
+There will be `grunt.js` file in your project directory that *knows* how to perform these actions with the correct paths, options and order. When you need to run (test, deploy, …) the code, just type `grunt` in the project directory and the application will be ready to be deployed or run in the localhost.
+
+The following is an example of a `grunt.js` file:
+
+{% highlight javascript %}
+module.exports = function(grunt) {
+  grunt.loadNpmTasks('grunt-contrib');  // grunt-contrib line, remove if not using it
+  grunt.initConfig({
+    // COMPILE HANDLEBARS TEMPLATES
+    handlebars: {
+      dist: {
+        files: {
+          '../static/js/templates.js': 'js/templates/*.handlebars'
+        }
+      }
+    },
+    // CONCAT
+    concat: {
+      dist: {
+        src: ['../static/js/templates.js', 'js/app.js', 'js/models/*.js',
+              'js/collections/*.js', 'js/views/*.js', 'js/routers/router.js'],
+        dest: '../static/js/foo.js',
+        separator: ';'
+      }
+    },
+    // MINIFY JAVASCRIPT
+    min: {
+      dist: {
+        src: '../static/js/foo.js',
+        dest: '../static/js/foo.min.js'
+      }
+    },
+    // MINIFY CSS
+    mincss: {
+      dist: {
+        files: {
+          '../static/css/foo.css': 'css/*.css'
+        }
+      }
+    }
+  });
+  // DEFAULT TASK (executed on `grunt` without opts) 
+  grunt.registerTask('default', 'handlebars concat min mincss');
+};
+{% endhighlight %}
+
+### Compiling Templates
+
+Recently, I made modified @tbranyen's [grunt-contrib](https://github.com/gruntjs/grunt-contrib)) grunt task for compiling handlebars templates. It's available at [my github](https://github.com/lrei/grunt-handlebars) if you want to use it.
+
+Otherwise, manually compiling the templates is extremely easy:
+
+	handlebars --output example.js example.handlebars
+
+## More on Requests & Responses
+
+### Backbone.Sync
+> Backbone.sync is the function that Backbone calls every time it attempts to read or save a model to the server. By default, it uses (jQuery/Zepto).ajax to make a RESTful JSON request and returns a [jqXHR](http://api.jquery.com/jQuery.ajax/#jqXHR). You can override it in order to use a different persistence strategy, such as WebSockets, XML transport, or Local Storage.
+
+For an example of how to completely replace Backbone.sync with Local Storage, see [backbone-localstorage.js](http://documentcloud.github.com/backbone/docs/backbone-localstorage.html).
+
+The default map from CRUD to HTTP is kept in Backbone's methodMap:
+
+{% highlight javascript %}
+// Map from CRUD to HTTP for our default `Backbone.sync` implementation.
+var methodMap = {
+  'create': 'POST',
+  'update': 'PUT'
+  'delete': 'DELETE',
+  'read':   'GET'
+};
+{% endhighlight %}
+
+To save (create or update) a model, Backbone.sync will call $.ajax with the appropriate `method` (`POST` or `PUT`), pass it the model's attributes serialized as JSON as the `body` and set the request's `Content-Type` header to `application/json`.
+
+
+### Parsing Responses
+
+When a response arrives from the server, the `parse` method is called. For models, it converts a response into the hash of attributes to be `set` on the model. For collections, it converts the a response into a list of models that are added to the collection.
+
+Sometimes, it is useful to override this method, such as when the server response HTTP header contains more useful information aside from the actual model or collection. This parse function
+
+{% highlight javascript %}
+parse: function(resp, xhr) {
+  var linkHeader = xhr.getResponseHeader('Link');
+  var links = linkHeader.split(',');
+  for (var ii = 0; ii < links.length; ii++) {
+    if (links[ii].indexOf('rel="cur"') >= 0) {
+      this.currentPage = parseInt(/page=(\d+)/.exec(links[ii])[1], 10);
+    }
+    if (links[ii].indexOf('rel="last"') >= 0) {
+      this.lastPage = parseInt(/page=(\d+)/.exec(links[ii])[1], 10);
+    }
+  }
+  return resp;
+}
+{% endhighlight %}
+
+will parse a server response which contains a "Link" field on the HTTP header like this:
+
+	Link:<http://example.org/foos?page=2>; rel="cur", <http://example.org/foos?page=2>; rel="last", <http://example.org/foos?page=1>; rel="first", <http://example.org/foos?page=1>; rel="prev"
+
+and extract the current and last page's index values.
+
+
+### Bootstraping
+ 
+From the Backbone.js documentation:
+
+> When your app first loads, it's common to have a set of initial models that you know you're going to need, in order to render the page. Instead of firing an extra AJAX request to fetch them, a nicer pattern is to have their data already bootstrapped into the page.
+
+Bootstrapping data makes a huge difference in the initial load time of a Backbone.js app: instead of downloading the HTML and then making a series of asynchronous requests, the HTML file will already contain all the data necessary. This is usually achieved by having the server-side framework (RoR, Play, Flask, …) *render* the HTML file with the data inside a `script` tag:
+
+{% highlight html %}
+{{{% if foos %}}}
+  <script type="text/javascript">
+    var foosGlobal = JSON.parse({{ foos|tojson|safe }});
+  </script>
+{{{% endif %}}}
+{% endhighlight %}
+
+In this case I'm using a [Jinja2](http://jinja.pocoo.org) template to create an "index.html" file with a `script` tag that creates a global variable containing the array of objects that will then be used to initialize our collection
+
+{% highlight javascript %}
+var foosView;
+var foos = new App.Collections.Foos();
+
+// check if bootstrapped 
+if(window.foosGlobal && foosGlobal) {
+	// bootstrapped
+  foos.reset(foosGlobal);	// use bootstrapped data
+  foosGlobal = null;		// marks the bootstrapped data as "used"
+}
+else {
+  // not bootstrapped
+  foos.fetch();	// fetch data
+}
+// Create & Render view
+foosView = new App.Views.Foos({collection: foos});
+foosView.render();
+{% endhighlight %}
+
+### PushState
+
+Passing `pushState: true` to the `Backbone.history.start()` call 
+
+{% highlight javascript %}
+Backbone.history.start({pushState: true})
+{% endhighlight %}
+
+switches from using hash-based URL fragments like
+
+	http://www.example.com/#foos
+
+to "*real*" URLs like
+
+	http://www.example.com/foos
+
+Now, however, **the web server must be able to serve that page, if the browser visits that URL directly.**
+
+But that makes it even easier/cleaner to integrate with a server-side framework and bootstrap the data needed by that page. If the user requests
+
+	http://www.example.com/foos/123
+
+the server-side framework  can serve the page with that exact resource, *foo 123*, bootstrapped in.
+
+
+## JavaScript Books
+JavaScript: The Definitive Guide by David Flanagan
+JavaScript: The Good Parts by Douglas Crockford
+[Learning JavaScript Design Patterns](http://addyosmani.com/resources/essentialjsdesignpatterns/book/) by Addy Osmani
+

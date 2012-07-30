@@ -21,7 +21,7 @@ p {
 }
 
 h1 {
-  font-size: 22px;
+  font-size: 24px;
   border-bottom: 1px solid #cccccc;
   padding: .5em 0;
   margin: 2em 0 1em;
@@ -32,12 +32,12 @@ h1:first-child {
 }
 
 h2 {
-  font-size: 18px;
+  font-size: 20px;
   color: #333;
   margin: 2em auto 1em;
 }
 
-  body.api .content h2 {
+body.api .content h2 {
     padding-left: 22px;
   }
 
@@ -192,7 +192,7 @@ a img {
 
 .content ul,
 .content ol {
-  margin-left: 1.5em;
+  margin-left: 2.0em;
 }
 
 .content ul {
