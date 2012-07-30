@@ -2,9 +2,9 @@
 title: Developing REST API Client Applications with JavaScript & Backbone.js
 layout: post
 ---
-# An Introduction to Client-Side Web Application Development
+## An Introduction to Client-Side Web Application Development
 
-## Introduction
+## Overview
 
 [Backbone.js](http://backbonejs.org) is a JavaScript framework for creating single-page web applications. In broad terms this means our application will consist of one HTML file which will be dynamically modified by the JavaScript according to user actions and JSON formatted data from the server. Rendering (converting data to HTML) will be done by the client application.
 
