@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>{{ page.title }}</title>
+    <link href="/shared/css/documentation.css" media="screen" rel="stylesheet" type="text/css">
+    <link href="/shared/css/pygments.css" media="screen" rel="stylesheet" type="text/css">
+	<link href="/stylesheets/screen.css" media="screen" rel="stylesheet" type="text/css">
+
+  </head>
+  
+  <body>
+    <div id="main">
+      <div id="wrapper">
+	
+		<!-- SITE CONTENT -->
+        <div id="content" class="site">
+			<h1>{{ page.title }}</h1>
+			<div class ="metadata">
+			  <div class="author">
+		      <p>
+		       <b>Luis Rei</b><br/>
+				<a href="http://luisrei.com">http://luisrei.com</a> 
+		      </p>
+		    </div>
+		      <div class="author">
+				<p>
+				 me@luisrei.com<br/>
+				 <a href="http://twitter.com/lmrei">@lmrei</a>
+				</p>
+			  </div>
+			  <div class="docdate">
+			    <p><br/>
+				  {% if page.url != "/index.html" %}
+				  {{ page.date | date_to_string }}<br/>
+				  {% endif %}
+			    </p>
+			  </div>
+			</div>
+			<div class="data">
+			
+          {{ content }}
+
+        
+		</div>
+		<!-- FOOTER -->
+		 <div class="footer">
+			
+		 <!-- RSS -->
+		 	<div class="rss">
+			      <a href="http://feeds.feedburner.com/lrei_articles">RSS
+			      </a>
+			 </div>
+			<!-- /RSS -->
+			<div class="footernav">
+				<a href="http://luisrei.com">home</a><br/>
+				<a href="/">article list</a><br/>
+				<a href="https://github.com/lrei/articles/tree/gh-pages"> fork me on github</a>
+			</div>
+		 </div>
+		<!-- /FOOTER -->
+		</div>
+		
+		<!-- /SITE CONTENT -->
+      </div>
+
+
+
+	<!-- Google Analytics -->
+	<script type="text/javascript">
+
+	  var _gaq = _gaq || [];
+	  _gaq.push(['_setAccount', 'UA-7429955-5']);
+	  _gaq.push(['_trackPageview']);
+
+	  (function() {
+	    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	  })();
+	</script>
+	<!-- /Google Analytics -->
+  </body>
+
+</html>
