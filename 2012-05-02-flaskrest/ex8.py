@@ -28,7 +28,7 @@ def requires_auth(f):
         if not auth: 
             return authenticate()
         elif not check_auth(auth.username, auth.password):
-            return authenticate("Authentication Failed.")
+            return authenticate()
         return f(*args, **kwargs)
     return decorated
 
