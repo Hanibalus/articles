@@ -34,7 +34,7 @@
 			  <div class="docdate">
 			    <p><br/>
 				  {% if page.url != "/index.html" %}
-				  {{ page.date | date_to_string }}<br/>
+				  {{ page.date | date: "%d %B %Y" }}<br/>
 				  {% endif %}
 			    </p>
 			  </div>
