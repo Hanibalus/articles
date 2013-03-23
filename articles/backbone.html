@@ -25,16 +25,22 @@
 				<a href="http://luisrei.com">http://luisrei.com</a> 
 		      </p>
 		    </div>
-		      <div class="author">
-				<p>
-				 me@luisrei.com<br/>
-				 <a href="http://twitter.com/lmrei">@lmrei</a>
-				</p>
-			  </div>
+		    <div class="author">
+		   	  <p>
+		      <a href="mailto:me@luisrei.com">email</a><br/>
+		   	  <a href="http://twitter.com/lmrei">@lmrei</a>
+		   	  </p>
+		   	 </div>
+		     <div class="author">
+		   		<p>
+		   		<a href="https://github.com/lrei">github.com/lrei</a>
+		   		<a href="pt.linkedin.com/in/lmrei">linkedin/in/lmrei</a>
+		   	    </p>
+			</div>
 			  <div class="docdate">
 			    <p><br/>
 				  
-				  30 Jul 2012<br/>
+				  30 July 2012<br/>
 				  
 			    </p>
 			  </div>
@@ -127,15 +133,13 @@
   <span class="nx">Views</span><span class="o">:</span> <span class="p">{},</span>
   <span class="nx">init</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>   <span class="p">},</span>
 <span class="p">}</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>This will be part of our js/app.js and in another file, such as js/models/example.js, we have</p>
 
 <div class="highlight"><pre><code class="javascript"><span class="nx">App</span><span class="p">.</span><span class="nx">Models</span><span class="p">.</span><span class="nx">Example</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>   <span class="p">});</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>Alternatively, consider using <a href="http://requirejs.org">RequireJS</a> a JavaScript file and module loader (which I don't use).</p>
@@ -173,8 +177,7 @@ js/
 <div class="highlight"><pre><code class="javascript"><span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="nx">App</span><span class="p">.</span><span class="nx">init</span><span class="p">();</span>
 <span class="p">});</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>The application starts by creating a <code>Router</code> and enabling routing by calling <code>Backbone.history.start()</code> which monitors the browser for URL changes</p>
@@ -183,8 +186,7 @@ js/
   <span class="nx">App</span><span class="p">.</span><span class="nx">router</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">.</span><span class="nx">Routers</span><span class="p">.</span><span class="nx">Router</span><span class="p">();</span>
   <span class="nx">Backbone</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">start</span><span class="p">();</span>
 <span class="p">},</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>A router simply maps a browser URL such as</p>
@@ -195,8 +197,7 @@ js/
 <p>(note the <strong>#</strong> or hash) to a function such as</p>
 
 <div class="highlight"><pre><code class="javascript"><span class="nx">directory</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>   <span class="p">}</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>URL changes will <strong>not trigger page refreshes</strong>, instead they trigger an event that will be handled by the router</p>
@@ -209,8 +210,7 @@ js/
   <span class="nx">index</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>  <span class="p">},</span>
   <span class="nx">foo</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>  <span class="p">}</span>
 <span class="p">});</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>This example router maps URLs such as</p>
@@ -226,8 +226,7 @@ js/
   <span class="kd">var</span> <span class="nx">fooView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Foo</span><span class="p">({</span><span class="nx">model</span><span class="o">:</span><span class="nx">foo</span><span class="p">});</span>
   <span class="nx">fooView</span><span class="p">.</span><span class="nx">render</span><span class="p">();</span>
 <span class="p">}</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <h2>Models</h2>
@@ -252,8 +251,7 @@ js/
   <span class="nx">id</span><span class="o">:</span> <span class="s2">&quot;123&quot;</span><span class="p">,</span>
   <span class="nx">title</span><span class="o">:</span> <span class="s2">&quot;A Special Foo&quot;</span>
 <span class="p">}</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>Than <code>model.fetch()</code></p>
@@ -261,22 +259,19 @@ js/
 <div class="highlight"><pre><code class="javascript"><span class="nx">App</span><span class="p">.</span><span class="nx">Models</span><span class="p">.</span><span class="nx">Foo</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({});</span>
 <span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="nx">App</span><span class="p">.</span><span class="nx">Models</span><span class="p">.</span><span class="nx">Foo</span><span class="p">({</span><span class="nx">urlRoot</span> <span class="o">:</span> <span class="s1">&#39;/foos&#39;</span><span class="p">,</span> <span class="nx">id</span><span class="o">:</span><span class="s1">&#39;123&#39;</span><span class="p">});</span>
 <span class="nx">foo</span><span class="p">.</span><span class="nx">fetch</span><span class="p">();</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>will perform, by default, an HTTP <code>GET</code> request at <em>/foos/123</em> and fill the model with the data returned from the server while <code>model.destroy()</code></p>
 
 <div class="highlight"><pre><code class="javascript"><span class="nx">foo</span><span class="p">.</span><span class="nx">destroy</span><span class="p">({</span><span class="nx">wait</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>will send an HTTP <code>DELETE</code> request to the same URL. The <code>wait</code> attribute tells Backbone to wait for the server to successfully acknowledge the action before actually deleting the model and triggering the <code>'destroy'</code> event. Finally, <code>model.save()</code></p>
 
 <div class="highlight"><pre><code class="javascript"><span class="nx">foo</span><span class="p">.</span><span class="nx">save</span><span class="p">({</span><span class="nx">title</span><span class="o">:</span><span class="s1">&#39;A New Title&#39;</span><span class="p">,</span> <span class="nx">wait</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>will issue an HTTP <code>PUT</code> request at <em>/foos/123</em> containing <strong>all of the model's attributes</strong> - a complete representation of the resource, not just the attributes that were modified.</p>
@@ -295,8 +290,7 @@ js/
   <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">save</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">attributes</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">});</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>And this change would be in effect only for this specific model.</p>
@@ -306,8 +300,7 @@ js/
 <div class="highlight"><pre><code class="javascript"><span class="nx">App</span><span class="p">.</span><span class="nx">Models</span><span class="p">.</span><span class="nx">Foo</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
   <span class="nx">idAttribute</span><span class="o">:</span> <span class="s1">&#39;_id&#39;</span><span class="p">,</span>
 <span class="p">});</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>This is useful if dealing with JSON generated from a database that stores ids under a different name (e.g. the default mongo document <a href="http://www.mongodb.org/display/DOCS/Object+IDs">_id field</a>).</p>
@@ -322,8 +315,7 @@ js/
     <span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;Default Title&#39;</span> 
   <span class="p">}</span>
 <span class="p">});</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>Additionally it is also possible to define an <code>initialize</code> function that will be invoked when the model is created.</p>
@@ -340,8 +332,7 @@ js/
 <span class="nx">foo</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="s1">&#39;change&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">render</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
 <span class="c1">// the context argument is optional</span>
 <span class="nx">foo</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;destroy&#39;</span><span class="p">,</span> <span class="nx">fooDestroyedCallback</span><span class="p">);</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>When the event 'change' happens in the foo object, the this.render() function will be called with <code>this</code> as its context. Thus also solving the problem of "losing" <code>this</code> in callbacks.</p>
@@ -358,8 +349,7 @@ js/
 <span class="nx">foo</span><span class="p">.</span><span class="nx">off</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
 <span class="c1">// Remove all callbacks for the object</span>
 <span class="nx">foo</span><span class="p">.</span><span class="nx">off</span><span class="p">();</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>The final piece of the Backbone.Events module is <code>trigger</code>:</p>
@@ -367,8 +357,7 @@ js/
 <div class="highlight"><pre><code class="javascript"><span class="nx">foo</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;change&#39;</span><span class="p">);</span>
 <span class="nx">foo</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;change delete end&#39;</span><span class="p">);</span>
 <span class="nx">foo</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;change&#39;</span><span class="p">,</span> <span class="nx">arg1</span><span class="p">,</span> <span class="nx">arg2</span><span class="p">);</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>which simply triggers the callback for an event or list of events and optionally passes arguments to the event callbacks.</p>
@@ -415,8 +404,7 @@ js/
     <span class="k">this</span><span class="p">.</span><span class="nx">model</span><span class="p">.</span><span class="nx">destroy</span><span class="p">({</span><span class="nx">wait</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
   <span class="p">}</span>
 <span class="p">});</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>The central parts of this view are:</p>
@@ -431,15 +419,13 @@ js/
 <p>Every view has an <code>el</code> which is the DOM element associated with. It will <em>listen</em> for events within it. This DOM element can already exist within the DOM or may be inserted after the view is created. <code>el</code> is created from the view's <code>tagName</code> (default, <code>div</code>), <code>className</code> and <code>id</code> attributes. So</p>
 
 <div class="highlight"><pre><code class="javascript"><span class="nx">className</span><span class="o">:</span> <span class="s2">&quot;foo-item&quot;</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>results in the DOM element</p>
 
 <div class="highlight"><pre><code class="html"><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;foo-item&quot;</span><span class="nt">&gt;</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>There is also a convenience <code>$el</code> jQuery object. The other useful shortcut is the <code>remove()</code> method which removes the view from the DOM - short for <code>$(view.el).remove()</code>.</p>
@@ -458,8 +444,7 @@ js/
 
 <span class="nt">&lt;button</span> <span class="na">class=</span><span class="s">&quot;.button-edit&quot;</span><span class="nt">&gt;</span>delete<span class="nt">&lt;/button&gt;</span>
 <span class="nt">&lt;button</span> <span class="na">class=</span><span class="s">&quot;.button-delete&quot;</span><span class="nt">&gt;</span>delete<span class="nt">&lt;/button&gt;</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>which was created to present (and manipulate) data from a model like this</p>
@@ -470,8 +455,7 @@ js/
     <span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;Default Title&#39;</span> 
   <span class="p">}</span>
 <span class="p">});</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>Than it is necessary to have a View to connect them</p>
@@ -482,16 +466,14 @@ js/
       <span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">model</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">();</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">html</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">template</span><span class="p">(</span><span class="nx">data</span><span class="p">));</span>
 <span class="p">});</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>Than it's just a matter of calling something like</p>
 
 <div class="highlight"><pre><code class="javascript"><span class="kd">var</span> <span class="nx">fooView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Foo</span><span class="p">({</span><span class="nx">model</span><span class="o">:</span><span class="nx">foo</span><span class="p">});</span>
 <span class="nx">fooView</span><span class="p">.</span><span class="nx">render</span><span class="p">();</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>from somewhere - e.g. the router or even a collection view.</p>
@@ -503,29 +485,25 @@ js/
     <span class="nx">id</span><span class="o">:</span> <span class="s2">&quot;123&quot;</span><span class="p">,</span>
   <span class="nx">title</span><span class="o">:</span> <span class="s2">&quot;A Special Foo&quot;</span>
 <span class="p">}</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>Handlebars takes that JSON and "fills" the template so that where</p>
 
 <div class="highlight"><pre><code class="html"><span class="nt">&lt;h3&gt;</span>{{ title }}<span class="nt">&lt;/h3&gt;</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>occurs in the template,</p>
 
 <div class="highlight"><pre><code class="javascript"><span class="nx">template</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>will instead have</p>
 
 <div class="highlight"><pre><code class="html"><span class="nt">&lt;h3&gt;</span>A Special Foo<span class="nt">&lt;/h3&gt;</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>Aside from simply replacing variables, Handlebars templates support other expressions such <code>list</code>, <code>with</code>, <code>each</code>, <code>if</code> and <code>unless</code>.</p>
@@ -541,8 +519,7 @@ js/
 <div class="highlight"><pre><code class="javascript"><span class="nx">App</span><span class="p">.</span><span class="nx">Collections</span><span class="p">.</span><span class="nx">Foos</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Collection</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
   <span class="nx">model</span><span class="o">:</span> <span class="nx">App</span><span class="p">.</span><span class="nx">Models</span><span class="p">.</span><span class="nx">Foo</span>
 <span class="p">});</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <h3>Basic Operations</h3>
@@ -563,30 +540,26 @@ js/
     <span class="nx">title</span><span class="o">:</span> <span class="s2">&quot;Another Foo&quot;</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>Than <code>collection.fetch()</code></p>
 
 <div class="highlight"><pre><code class="javascript"><span class="nx">foos</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">.</span><span class="nx">Collections</span><span class="p">.</span><span class="nx">Foos</span><span class="p">({</span><span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;/foos&#39;</span><span class="p">});</span>
 <span class="nx">foos</span><span class="p">.</span><span class="nx">fetch</span><span class="p">();</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>will perform an HTTP GET at /foos, retrieving that set of models. The App.Collections.Foos instance <strong>will be reset</strong> and a <code>reset</code> event triggered (that might be handled by the view). The <code>add</code> parameter is used to add new models <strong>instead of replacing</strong> the entire collection</p>
 
 <div class="highlight"><pre><code class="javascript"><span class="nx">foos</span><span class="p">.</span><span class="nx">fetch</span><span class="p">({</span><span class="nx">add</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p><strong><a href="http://api.jquery.com/jQuery.ajax/">jQuery.ajax</a> options can also be passed directly as fetch options</strong>:</p>
 
 <div class="highlight"><pre><code class="javascript"><span class="nx">foos</span><span class="p">.</span><span class="nx">fetch</span><span class="p">({</span><span class="nx">data</span><span class="o">:</span> <span class="p">{</span><span class="nx">page</span><span class="o">:</span> <span class="mi">5</span><span class="p">,</span> <span class="nx">per_page</span><span class="o">:</span> <span class="mi">100</span><span class="p">}})</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>which means the HTTP <code>GET</code> request will have two parameters, <code>page</code> and <code>per_page</code>, with the specified values.</p>
@@ -598,8 +571,7 @@ js/
 <p>The <code>collection.create()</code> method is an exception. It is a convenience method that creates a new instance of a model, saves it to the server and adds it to the collection.</p>
 
 <div class="highlight"><pre><code class="javascript"><span class="nx">foos</span><span class="p">.</span><span class="nx">create</span><span class="p">({</span><span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;Yet more Foo&#39;</span><span class="p">},</span> <span class="p">{</span><span class="nx">wait</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>It is conceptually equivalent to using <code>model.save()</code> and <code>collection.add()</code> in the sense that will perform the <code>create</code> (HTTP <code>POST</code>), wait for confirmation because of the <code>wait</code> parameter, and then add the model to the collection triggering an <code>add</code> event in it.</p>
@@ -618,8 +590,7 @@ js/
 <span class="kd">var</span> <span class="nx">titles</span> <span class="o">=</span> <span class="nx">foos</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">foo</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">return</span> <span class="nx">foo</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">);</span>
 <span class="p">});</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <h3>Sorting</h3>
@@ -635,8 +606,7 @@ js/
     <span class="k">return</span> <span class="o">-</span><span class="nx">d</span><span class="p">.</span><span class="nx">valueOf</span><span class="p">();</span>
   <span class="p">}</span>
 <span class="p">});</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>Or the alternative that takes two parameters:</p>
@@ -652,8 +622,7 @@ js/
   <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>  
   <span class="p">}</span>
 <span class="p">});</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <h2>Grunt</h2>
@@ -715,8 +684,7 @@ js/
   <span class="c1">// DEFAULT TASK (executed on `grunt` without opts) </span>
   <span class="nx">grunt</span><span class="p">.</span><span class="nx">registerTask</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="s1">&#39;handlebars concat min mincss&#39;</span><span class="p">);</span>
 <span class="p">};</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <h3>Compiling Templates</h3>
@@ -745,8 +713,7 @@ js/
   <span class="s1">&#39;delete&#39;</span><span class="o">:</span> <span class="s1">&#39;DELETE&#39;</span><span class="p">,</span>
   <span class="s1">&#39;read&#39;</span><span class="o">:</span>   <span class="s1">&#39;GET&#39;</span>
 <span class="p">};</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>To save (create or update) a model, Backbone.sync will call $.ajax with the appropriate <code>method</code> (<code>POST</code> or <code>PUT</code>), pass it the model's attributes serialized as JSON as the <code>body</code> and set the request's <code>Content-Type</code> header to <code>application/json</code>.</p>
@@ -770,8 +737,7 @@ js/
   <span class="p">}</span>
   <span class="k">return</span> <span class="nx">resp</span><span class="p">;</span>
 <span class="p">}</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>will parse a server response which contains a "Link" field on the HTTP header like this:</p>
@@ -798,8 +764,7 @@ js/
   <span class="nt">&lt;/script&gt;</span>
 
 {% endif %}
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>In this case I'm using a <a href="http://jinja.pocoo.org">Jinja2</a> template to create an "index.html" file with a <code>script</code> tag that creates a global variable containing the array of objects that will then be used to initialize our collection</p>
@@ -820,8 +785,7 @@ js/
 <span class="c1">// Create &amp; Render view</span>
 <span class="nx">foosView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Foos</span><span class="p">({</span><span class="nx">collection</span><span class="o">:</span> <span class="nx">foos</span><span class="p">});</span>
 <span class="nx">foosView</span><span class="p">.</span><span class="nx">render</span><span class="p">();</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <h3>PushState</h3>
@@ -829,8 +793,7 @@ js/
 <p>Passing <code>pushState: true</code> to the <code>Backbone.history.start()</code> call</p>
 
 <div class="highlight"><pre><code class="javascript"><span class="nx">Backbone</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">start</span><span class="p">({</span><span class="nx">pushState</span><span class="o">:</span> <span class="kc">true</span><span class="p">})</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>switches from using hash-based URL fragments like</p>

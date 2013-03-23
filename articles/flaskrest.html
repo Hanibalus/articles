@@ -25,12 +25,18 @@
 				<a href="http://luisrei.com">http://luisrei.com</a> 
 		      </p>
 		    </div>
-		      <div class="author">
-				<p>
-				 me@luisrei.com<br/>
-				 <a href="http://twitter.com/lmrei">@lmrei</a>
-				</p>
-			  </div>
+		    <div class="author">
+		   	  <p>
+		      <a href="mailto:me@luisrei.com">email</a><br/>
+		   	  <a href="http://twitter.com/lmrei">@lmrei</a>
+		   	  </p>
+		   	 </div>
+		     <div class="author">
+		   		<p>
+		   		<a href="https://github.com/lrei">github.com/lrei</a>
+		   		<a href="pt.linkedin.com/in/lmrei">linkedin/in/lmrei</a>
+		   	    </p>
+			</div>
 			  <div class="docdate">
 			    <p><br/>
 				  
@@ -94,8 +100,7 @@
 
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>You can use curl to make the requests using:</p>
@@ -118,8 +123,7 @@ You are reading 123
 <p>Routes can use different <a href="http://flask.pocoo.org/docs/api/#url-route-registrations">converters</a> in their definition,</p>
 
 <div class="highlight"><pre><code class="python"><span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/articles/&lt;articleid&gt;&#39;</span><span class="p">)</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>Can be replaced by</p>
@@ -127,8 +131,7 @@ You are reading 123
 <div class="highlight"><pre><code class="python"><span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/articles/&lt;int:articleid&gt;&#39;</span><span class="p">)</span>
 <span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/articles/&lt;float:articleid&gt;&#39;</span><span class="p">)</span>
 <span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/articles/&lt;path:articleid&gt;&#39;</span><span class="p">)</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>The default is <code>string</code> which accepts any text without slashes.</p>
@@ -149,8 +152,7 @@ You are reading 123
         <span class="k">return</span> <span class="s">&#39;Hello &#39;</span> <span class="o">+</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="s">&#39;Hello John Doe&#39;</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>the server will reply in the following manner:</p>
@@ -182,8 +184,7 @@ Hello Luis
 
     <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;DELETE&#39;</span><span class="p">:</span>
         <span class="k">return</span> <span class="s">&quot;ECHO: DELETE&quot;</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>To curl the -X option can be used to specify the request type:</p>
@@ -227,8 +228,7 @@ ECHO: POST
 
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="s">&quot;415 Unsupported Media Type ;)&quot;</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>To specify the content type with curl:</p>
@@ -274,8 +274,7 @@ Binary message written!
     <span class="n">resp</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;Link&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;http://luisrei.com&#39;</span>
 
     <span class="k">return</span> <span class="n">resp</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>To view the response HTTP headers using curl, specify the <code>-i</code> option:</p>
@@ -300,23 +299,20 @@ Date: Wed, 25 Apr 2012 16:40:27 GMT
 <p>The previous example can be further simplified by using a Flask convenience method for generating JSON responses:</p>
 
 <div class="highlight"><pre><code class="python">   <span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">jsonify</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>and replacing</p>
 
 <div class="highlight"><pre><code class="python"> <span class="n">resp</span> <span class="o">=</span> <span class="n">Response</span><span class="p">(</span><span class="n">js</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">mimetype</span><span class="o">=</span><span class="s">&#39;application/json&#39;</span><span class="p">)</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>with</p>
 
 <div class="highlight"><pre><code class="python"><span class="n">resp</span> <span class="o">=</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span> <span class="o">=</span> <span class="mi">200</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>which will generate the exact same response as the previous code.</p>
@@ -346,8 +342,7 @@ Date: Wed, 25 Apr 2012 16:40:27 GMT
         <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="n">userid</span><span class="p">:</span><span class="n">users</span><span class="p">[</span><span class="n">userid</span><span class="p">]})</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">not_found</span><span class="p">()</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>This produces:</p>
@@ -369,8 +364,7 @@ HTTP/1.0 404 NOT FOUND
 <p>Default Flask error messages can be overwritten using either the <code>@error_handler</code> decorator or</p>
 
 <div class="highlight"><pre><code class="python"><span class="n">app</span><span class="o">.</span><span class="n">error_handler_spec</span><span class="p">[</span><span class="bp">None</span><span class="p">][</span><span class="mi">404</span><span class="p">]</span> <span class="o">=</span> <span class="n">not_found</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>Even if the API does not need custom error messages, if supports different mime types (JSON, XML, …) this feature is important because Flask defaults to HTML errors.</p>
@@ -403,12 +397,11 @@ HTTP/1.0 404 NOT FOUND
             <span class="k">return</span> <span class="n">authenticate</span><span class="p">()</span>
 
         <span class="k">elif</span> <span class="ow">not</span> <span class="n">check_auth</span><span class="p">(</span><span class="n">auth</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">auth</span><span class="o">.</span><span class="n">password</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">authenticate</span><span class="p">(</span><span class="s">&quot;Authentication Failed.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">authenticate</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">decorated</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>And using it is a matter of replacing the <code>check_auth</code> function and using the <code>requires_auth</code> decorator:</p>
@@ -417,8 +410,7 @@ HTTP/1.0 404 NOT FOUND
 <span class="nd">@requires_auth</span>
 <span class="k">def</span> <span class="nf">api_hello</span><span class="p">():</span>
     <span class="k">return</span> <span class="s">&quot;Shhh this is top secret spy stuff!&quot;</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>So now, and unauthenticated request:</p>
@@ -446,8 +438,7 @@ Shhh this is top secret spy stuff!
 
 <div class="highlight"><pre><code class="python"><span class="n">resp</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;WWW-Authenticate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;Basic realm=&quot;Example&quot;&#39;</span>
 <span class="n">resp</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;WWW-Authenticate&#39;</span><span class="p">,</span> <span class="s">&#39;Bearer realm=&quot;Example&quot;&#39;</span><span class="p">)</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>or use a single line with multiple schemes (the standard allows both).</p>
@@ -457,8 +448,7 @@ Shhh this is top secret spy stuff!
 <p>Activating pretty (HTML) debug messages during development can be done simply by passing an argument</p>
 
 <div class="highlight"><pre><code class="python"><span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>Flask uses <a href="http://docs.python.org/library/logging.html">python logging</a> off the box - <em>some configuration required</em>:</p>
@@ -475,8 +465,7 @@ Shhh this is top secret spy stuff!
     <span class="n">app</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&#39;screaming bloody murder!&#39;</span><span class="p">)</span>
     
     <span class="k">return</span> <span class="s">&quot;check your logs</span><span class="se">\n</span><span class="s">&quot;</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <h2>Mini-Reference: curl options</h2>
