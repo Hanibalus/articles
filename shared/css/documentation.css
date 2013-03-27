@@ -221,6 +221,28 @@ a img {
   padding: 3px;
 }
 
+
+
+.content .sectionbody .dlist dt {
+  margin-top: 10px;
+}
+
+.content .verseblock-content {
+  padding: 3px;
+}
+
+.content .intro {
+  color: #868686;
+}
+/* @end */
+
+/*------------------------------------------------------------------------------
+     Pre/Code Styles
+------------------------------------------------------------------------------*/
+.docdate {
+	color: #aaa;
+	font: 14px Monaco,"Courier New","DejaVu Sans Mono","Bitstream Vera Sans Mono",monospace;
+}
 .content .verseblock-content,
 .content .sectionbody .dlist dt,
 .content p > tt,
@@ -240,23 +262,6 @@ p code {
   padding: 0px 3px;
   display: inline-block;
 }
-
-.content .sectionbody .dlist dt {
-  margin-top: 10px;
-}
-
-.content .verseblock-content {
-  padding: 3px;
-}
-
-.content .intro {
-  color: #868686;
-}
-/* @end */
-
-/*------------------------------------------------------------------------------
-     Pre/Code Styles
-------------------------------------------------------------------------------*/
 
 code {white-space: nowrap;}
 

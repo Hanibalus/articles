@@ -10,3 +10,7 @@ The following directories and their contents are Copyright Luis Rei. You may not
     * images/
 
 All other directories and files are under their original licenses or MIT Licensed.
+
+To genetate use:
+
+   jekyll --pygments --no-lsi --safe 
