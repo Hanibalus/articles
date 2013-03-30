@@ -1,6 +1,9 @@
 ---
 title: Implementing a RESTful Web API with Python & Flask
 layout: post
+tags:
+- REST
+- python
 ---
 [Example Code](https://github.com/lrei/articles/tree/master/2012-05-02-flaskrest)
 

@@ -1,4 +1,83 @@
 /*------------------------------------------------------------------------------
+     Site Style
+------------------------------------------------------------------------------*/
+
+@media print 
+{
+    .noPrint 
+    {
+        display:none;
+    }
+}
+.site .data {
+   margin-top: 2em;
+   clear: left;
+}
+
+.site .metadata p { 
+    margin: 0.5em 0px;
+ }
+
+.site .metadata .author {
+        float: left;
+        margin-right: 3em;
+        
+}
+.site .metadata .docdate {
+    clear: left;
+    color: #aaa;;
+}
+.site a.extra {
+  color: #aaa;
+  text-decoration: none;
+  margin-left: 1em;
+}
+
+ul.posts {
+      
+      margin-top: 2em;
+      margin-left: 2em;
+      margin-bottom: 2em;
+    }
+
+      ul.posts li {
+        line-height: 1.75em;
+      }
+
+      ul.posts span {
+        color: #aaa;
+		font: 14px Monaco,"Courier New","DejaVu Sans Mono","Bitstream Vera Sans Mono",monospace;
+      }
+   
+
+.site .footer {
+  color: #666;
+  border-top: 1px solid #cccccc;
+  margin-top: 2em;
+  overflow: hidden;
+}
+  .site .footer .rss {
+    margin-top: 1em;
+    margin-right: 0px;
+    float: right;
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+    .site .footer .rss a {
+      color: black;
+    }
+  .site .footer .footernav {
+      margin-top: 1.0em;
+      margin-right: -.2em;
+      float: left;
+  }
+    .site .footer .fork a {
+      color: #8085C1;
+    }
+
+
+/*------------------------------------------------------------------------------
      Global Documentation Styles
 ------------------------------------------------------------------------------*/
 
@@ -26,6 +105,7 @@ h1 {
   padding: .5em 0;
   margin: 2em 0 1em;
   line-height: 1.4em;
+  text-align: center;
 }
 
 h1:first-child {
@@ -35,27 +115,26 @@ h1:first-child {
 h2 {
   font-size: 28px;
   color: #333;
-  margin: 2em auto 1em;
+  letter-spacing: .125em;
+  text-align: center;
+  margin: 3em auto 3em;
   text-transform:uppercase;
 }
 
-body.api .content h2 {
-    padding-left: 22px;
-  }
 
 h2 span.step {
   color: #666;
 }
 
 h3 {
-  font-size: 22px;
+  font-size: 24px;
   color: #333;
-  margin: 2em auto 1em;
+  margin: 2em auto 2em;
 }
 
 h4 {
   font-size: 18px;
-  margin: 2em auto 1em;
+  margin: 1.5em auto 1em;
 }
 
 
@@ -71,14 +150,17 @@ h6 {
 }
 
 a {
-  color: #4183C4;
+  color: #c00;
   text-decoration: none;
 }
 
+
 a:hover,
 a:active {
+  color: black;
   text-decoration:underline;
 }
+
 
 blockquote {
   margin:0 -5px;
