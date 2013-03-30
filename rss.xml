@@ -1,23 +1,22 @@
-<?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
- 
- <title>BLOG_NAME</title>
- <link href="http://publish.luisrei.com/atom.xml" rel="self"/>
- <link href="http://publish.luisrei.com"/>
- <updated>2013-03-30T23:07:08+00:00</updated>
- <id>http://publish.luisrei.com/</id>
- <author>
-   <name>Luis Rei</name>
-	<email>me@luisrei.com</email>
- </author>
+<?xml version="1.0"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>blog.luisrei.com</title>
+    <link>http://blog.luisrei.com</link>
+    <atom:link href="http://example.com/rss.xml" rel="self" type="application/rss+xml" />
+    <description>blog.luisrei.com</description>
+    <language>en-us</language>
+    <pubDate>Sat, 30 Mar 2013 23:07:08 +0000</pubDate>
+    <lastBuildDate>Sat, 30 Mar 2013 23:07:08 +0000</lastBuildDate>
 
- 
- <entry>
-   <title>Client-Side Web Application Development with JavaScript &amp;amp; Backbone.js</title>
-   <link href="http://publish.luisrei.com/articles/backbone.html"/>
-   <updated>2012-07-30T00:00:00+01:00</updated>
-   <id>http://publish.luisrei.com/articles/backbone</id>
-   <content type="html">&lt;p&gt;&lt;a href=&quot;http://news.ycombinator.com/item?id=4317627&quot;&gt;Hacker News Discussion&lt;/a&gt;&lt;/p&gt;
+    
+    <item>
+      <title>Client-Side Web Application Development with JavaScript &amp; Backbone.js</title>
+      <link>http://blog.luisrei.com/articles/backbone.html</link>
+      <pubDate>Mon, 30 Jul 2012 00:00:00 +0100</pubDate>
+      <author>http://blog.luisrei.com Luis Rei</author>
+      <guid>http://blog.luisrei.com{ post.id }}</guid>
+      <description>&lt;p&gt;&lt;a href=&quot;http://news.ycombinator.com/item?id=4317627&quot;&gt;Hacker News Discussion&lt;/a&gt;&lt;/p&gt;
 
 &lt;h2&gt;Overview&lt;/h2&gt;
 
@@ -791,15 +790,16 @@ js/
 &lt;li&gt;&lt;a href=&quot;http://addyosmani.com/resources/essentialjsdesignpatterns/book/&quot;&gt;Learning JavaScript Design Patterns&lt;/a&gt; by Addy Osmani&lt;/li&gt;
 &lt;/ul&gt;
 
-</content>
- </entry>
- 
- <entry>
-   <title>Implementing a RESTful Web API with Python &amp; Flask</title>
-   <link href="http://publish.luisrei.com/articles/flaskrest.html"/>
-   <updated>2012-05-02T00:00:00+01:00</updated>
-   <id>http://publish.luisrei.com/articles/flaskrest</id>
-   <content type="html">&lt;p&gt;&lt;a href=&quot;https://github.com/lrei/articles/tree/master/2012-05-02-flaskrest&quot;&gt;Example Code&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Implementing a RESTful Web API with Python & Flask</title>
+      <link>http://blog.luisrei.com/articles/flaskrest.html</link>
+      <pubDate>Wed, 02 May 2012 00:00:00 +0100</pubDate>
+      <author>http://blog.luisrei.com Luis Rei</author>
+      <guid>http://blog.luisrei.com{ post.id }}</guid>
+      <description>&lt;p&gt;&lt;a href=&quot;https://github.com/lrei/articles/tree/master/2012-05-02-flaskrest&quot;&gt;Example Code&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&quot;http://news.ycombinator.com/item?id=3918986&quot;&gt;Hacker News Discussion&lt;/a&gt;&lt;/p&gt;
 
@@ -1265,15 +1265,16 @@ Shhh this is top secret spy stuff!
 &lt;p&gt;&lt;a href=&quot;http://werkzeug.pocoo.org/docs/&quot;&gt;Werkzeug documentation&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&quot;http://curl.haxx.se/docs/manual.html&quot;&gt;curl manual&lt;/a&gt;&lt;/p&gt;
-</content>
- </entry>
- 
- <entry>
-   <title>Designing a RESTful Web API</title>
-   <link href="http://publish.luisrei.com/articles/rest.html"/>
-   <updated>2012-02-26T00:00:00+00:00</updated>
-   <id>http://publish.luisrei.com/articles/rest</id>
-   <content type="html">&lt;p&gt;&lt;a href=&quot;http://news.ycombinator.com/item?id=3636805&quot;&gt;Hacker News Discussion&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Designing a RESTful Web API</title>
+      <link>http://blog.luisrei.com/articles/rest.html</link>
+      <pubDate>Sun, 26 Feb 2012 00:00:00 +0000</pubDate>
+      <author>http://blog.luisrei.com Luis Rei</author>
+      <guid>http://blog.luisrei.com{ post.id }}</guid>
+      <description>&lt;p&gt;&lt;a href=&quot;http://news.ycombinator.com/item?id=3636805&quot;&gt;Hacker News Discussion&lt;/a&gt;&lt;/p&gt;
 
 &lt;h2&gt;Purpose, Scope, Miscellaneous&lt;/h2&gt;
 
@@ -1632,8 +1633,9 @@ WWW-Authenticate: Basic realm=&quot;Twilio API&quot;
 &lt;p&gt;&lt;a href=&quot;http://shop.oreilly.com/product/9780596529260.do&quot;&gt;RESTful Web Services&lt;/a&gt; (Book) - Leonard Richardson, Sam Ruby&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&quot;http://shop.oreilly.com/product/9780596801694.do&quot;&gt;RESTful Web Services Cookbook&lt;/a&gt; (Book) - Subbu Allamaraju&lt;/p&gt;
-</content>
- </entry>
- 
- 
-</feed>
+</description>
+    </item>
+    
+
+  </channel> 
+</rss>
