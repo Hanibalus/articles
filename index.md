@@ -1,5 +1,5 @@
 ---
-title: publish.luisrei.com
+title: blog.luisrei.com
 layout: default
 ---
 
